@@ -141,54 +141,44 @@
         
         <div class="flex flex-wrap gap-3">
             @foreach($jadwals as $jadwal)
-                @php
-                    // Ambil tanggal saja (format Y-m-d)
-                    $tanggal = \Carbon\Carbon::parse($jadwal->tanggal_tayang)->format('Y-m-d');
-                    
-                    // Ambil jam saja (format H:i:s)
-                    $jam = \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i:s');
-                    
-                    // Gabungkan jadi datetime lengkap
-                    $jadwalDateTime = \Carbon\Carbon::parse($tanggal . ' ' . $jam);
-                    
-                    // Cek apakah jadwal sudah lewat
-                    $isPast = $jadwalDateTime->isPast();
-                    
-                    // Cek apakah kursi penuh
-                    $isFull = $jadwal->kursi_tersedia <= 0;
-                    
-                    // Format jam untuk tampilan
-                    $jamFormatted = \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i');
-                @endphp
-                
+    @php
+        // Format jam untuk tampilan
+        $jamFormatted = \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i');
+        
+        // Cek status (sudah dihitung di controller)
+        $isPast = $jadwal->sudah_lewat;
+        $isFull = $jadwal->kursi_penuh;
+        $isDisabled = $isPast || $isFull;
+    @endphp
+    
+    @if($isDisabled)
+        {{-- Button disabled (abu-abu pucat) --}}
+        <button disabled 
+                class="px-5 py-2.5 rounded-lg bg-gray-900 border border-gray-800 text-gray-600 font-semibold cursor-not-allowed opacity-40 relative group">
+            {{ $jamFormatted }}
+            
+            {{-- Tooltip saat hover --}}
+            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg">
                 @if($isPast)
-                    {{-- Jam sudah lewat --}}
-                    <button disabled 
-                            class="px-5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-gray-600 font-semibold cursor-not-allowed opacity-50 relative group">
-                        {{ $jamFormatted }}
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                            Jadwal sudah lewat
-                        </span>
-                    </button>
-                    
-                @elseif($isFull)
-                    {{-- Kursi penuh --}}
-                    <button disabled 
-                            class="px-5 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-gray-600 font-semibold cursor-not-allowed opacity-50 relative group">
-                        {{ $jamFormatted }}
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                            Kursi penuh
-                        </span>
-                    </button>
-                    
+                    ⏰ Jadwal sudah lewat
                 @else
-                    {{-- Jadwal tersedia --}}
-                    <a href="{{ route('pelanggan.pilih-kursi', ['id' => $jadwal->id]) }}"
-                       class="group relative px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-red-600 border border-neutral-700 hover:border-red-500 font-bold transition-all transform hover:scale-105">
-                        {{ $jamFormatted }}
-                    </a>
+                    🎫 Kursi penuh ({{ $jadwal->kursi_tersedia }}/{{ $jadwal->kursi_tersedia + \DB::table('pemesanan_kursis')->join('pemesanans', 'pemesanan_kursis.pemesanan_id', '=', 'pemesanans.id')->where('pemesanans.jadwal_id', $jadwal->id)->where('pemesanans.status_pembayaran', 'sudah_bayar')->count() }} tersedia)
                 @endif
-            @endforeach
+            </span>
+        </button>
+    @else
+        {{-- Button aktif (bisa diklik) --}}
+        <a href="{{ route('pelanggan.pilih-kursi', ['id' => $jadwal->id]) }}"
+           class="group relative px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-red-600 border border-neutral-700 hover:border-red-500 text-white font-bold transition-all transform hover:scale-105 shadow-lg hover:shadow-red-600/30">
+            {{ $jamFormatted }}
+            
+            {{-- Info kursi tersedia saat hover --}}
+            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg">
+                ✓ {{ $jadwal->kursi_tersedia }} kursi tersedia
+            </span>
+        </a>
+    @endif
+@endforeach
         </div>
     </div>
 @empty

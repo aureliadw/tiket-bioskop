@@ -85,28 +85,20 @@
                         <form action="{{ route('profile.update') }}" method="POST">
                             @csrf
                             <div class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-2 font-semibold">First Name</label>
-                                        <input type="text" name="name" 
-                                               value="{{ old('name', explode(' ', $user->name)[0] ?? $user->name) }}"
-                                               class="w-full px-4 py-3 bg-neutral-800/50 border-2 border-neutral-700 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all"
-                                               required>
-                                        @error('name')
-                                            <p class="text-red-400 text-xs mt-2 flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                                {{ $message }}
-                                            </p>
-                                        @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-2 font-semibold">Last Name</label>
-                                        <input type="text" name="last_name" 
-                                               value="{{ old('last_name', implode(' ', array_slice(explode(' ', $user->name), 1)) ?? '') }}"
-                                               class="w-full px-4 py-3 bg-neutral-800/50 border-2 border-neutral-700 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all">
-                                    </div>
-                                </div>
-
+                                <div>
+    <label class="block text-sm text-gray-400 mb-2 font-semibold">Name</label>
+    <input type="text" name="nama_lengkap" 
+           value="{{ old('nama_lengkap', $user->nama_lengkap) }}"
+           class="w-full px-4 py-3 bg-neutral-800/50 border-2 border-neutral-700 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all"
+           placeholder="Masukkan nama lengkap"
+           required>
+    @error('nama_lengkap')
+        <p class="text-red-400 text-xs mt-2 flex items-center gap-1">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ $message }}
+        </p>
+    @enderror
+</div>
                                 <div>
                                     <label class="block text-sm text-gray-400 mb-2 font-semibold">Email Address</label>
                                     <input type="email" name="email" 

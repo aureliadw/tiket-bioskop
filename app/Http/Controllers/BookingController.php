@@ -15,41 +15,39 @@ use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
-    public function pilihKursi($jadwal_id)
+    public function pilihKursi($jadwalId)
 {
-    if (!Auth::check()) {
-        return redirect()->route('login')->with('error', 'Silakan login untuk memesan kursi.');
-    }
+    // ⏰ AUTO-RELEASE: Hapus pemesanan yang expired (> 10 menit) dan belum bayar
+    Pemesanan::where('status_pembayaran', 'belum_bayar')
+        ->where('created_at', '<', now()->subMinutes(10))
+        ->delete();
 
-    $jadwal = Jadwal::with(['film', 'studio'])->findOrFail($jadwal_id);
-    $film = $jadwal->film;
-
+    $jadwal = Jadwal::with(['film', 'studio'])->findOrFail($jadwalId);
+    
+    // Ambil semua kursi di studio
     $kursis = Kursi::where('studio_id', $jadwal->studio_id)
         ->orderBy('baris')
         ->orderBy('kolom')
         ->get();
 
-    $pkTable = (new PemesananKursi())->getTable();
-    
-    // Kursi TERJUAL (merah) - sudah bayar untuk jadwal hari ini
-    $kursiTerjual = DB::table($pkTable)
-        ->join('pemesanans', $pkTable . '.pemesanan_id', '=', 'pemesanans.id')
-        ->where('pemesanans.jadwal_id', $jadwal_id)
+    // Kursi TERJUAL (status pembayaran = sudah_bayar)
+    $kursiTerjual = DB::table('pemesanan_kursis')
+        ->join('pemesanans', 'pemesanan_kursis.pemesanan_id', '=', 'pemesanans.id')
+        ->where('pemesanans.jadwal_id', $jadwalId)
         ->where('pemesanans.status_pembayaran', 'sudah_bayar')
-        ->whereDate('pemesanans.created_at', '>=', now()->startOfDay())
-        ->pluck($pkTable . '.kursi_id')
+        ->pluck('pemesanan_kursis.kursi_id')
         ->toArray();
 
-    // Kursi PENDING (kuning) - belum bayar untuk jadwal hari ini
-    $kursiPending = DB::table($pkTable)
-        ->join('pemesanans', $pkTable . '.pemesanan_id', '=', 'pemesanans.id')
-        ->where('pemesanans.jadwal_id', $jadwal_id)
+    // Kursi PENDING (status = belum_bayar, created_at < 10 menit yang lalu)
+    $kursiPending = DB::table('pemesanan_kursis')
+        ->join('pemesanans', 'pemesanan_kursis.pemesanan_id', '=', 'pemesanans.id')
+        ->where('pemesanans.jadwal_id', $jadwalId)
         ->where('pemesanans.status_pembayaran', 'belum_bayar')
-        ->whereDate('pemesanans.created_at', '>=', now()->startOfDay())
-        ->pluck($pkTable . '.kursi_id')
+        ->where('pemesanans.created_at', '>=', now()->subMinutes(10)) // Belum 10 menit
+        ->pluck('pemesanan_kursis.kursi_id')
         ->toArray();
 
-    return view('pelanggan.pilih-kursi', compact('film', 'jadwal', 'kursis', 'kursiTerjual', 'kursiPending'));
+    return view('pelanggan.pilih-kursi', compact('jadwal', 'kursis', 'kursiTerjual', 'kursiPending'));
 }
 
     public function prosesKursi(Request $request, $jadwal_id)
@@ -68,22 +66,12 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // ✅ GENERATE KODE BOOKING FORMAT BARU: TIX-YYYYMMDD-XXXX
-            $today = date('Ymd'); // 20250114
-            
-            // Hitung pemesanan hari ini untuk sequence
-            $count = Pemesanan::whereDate('created_at', today())->count();
-            
-            // Format: TIX-YYYYMMDD-XXXX
-            $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
-            $kodePemesanan = "TIX-{$today}-{$sequence}";
-            
-            Log::info("Generated booking code: {$kodePemesanan}");
+            $kodePemesanan = 'TIX-' . strtoupper(uniqid());
 
             $pemesanan = Pemesanan::create([
                 'user_id'           => Auth::id(),
                 'jadwal_id'         => $jadwal->id,
-                'kode_pemesanan'    => $kodePemesanan, // ✅ Format baru
+                'kode_pemesanan'    => $kodePemesanan,
                 'jumlah_kursi'      => count($request->kursi),
                 'total_bayar'       => count($request->kursi) * $hargaDasar,
                 'status_pemesanan'  => 'pending',
@@ -103,8 +91,6 @@ class BookingController extends Controller
             }
 
             DB::commit();
-            
-            Log::info("Booking created successfully: {$kodePemesanan}, Pemesanan ID: {$pemesanan->id}");
 
             return redirect()->route('pembayaran.show', $pemesanan->id)
                 ->with('success', 'Kursi berhasil dipilih, silakan lanjut ke pembayaran.');

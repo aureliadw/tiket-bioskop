@@ -17,49 +17,30 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $tab = $request->get('tab', 'profile'); // default tab profile
+        $tab = $request->get('tab', 'profile');
         
-        // Ambil riwayat pemesanan + relasi film & studio
-        $riwayat = Pemesanan::with(['jadwal.film', 'jadwal.studio'])
+        // Auto-delete pemesanan expired (belum bayar > 10 menit)
+        $this->deleteExpiredBookings($user->id);
+        
+        // Ambil riwayat pemesanan
+        $riwayat = Pemesanan::with(['jadwal.film', 'jadwal.studio', 'pembayaran'])
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
         
-        // Ambil kursi untuk setiap pemesanan dan update status otomatis
-        foreach ($riwayat as $pemesanan) {
-            $pkTable = (new PemesananKursi())->getTable();
-            $fkName = Schema::hasColumn($pkTable, 'pemesanan_id') ? 'pemesanan_id' :
-                      (Schema::hasColumn($pkTable, 'booking_id') ? 'booking_id' : null);
-            
-            $kursiIds = [];
-            if ($fkName) {
-                $kursiIds = DB::table($pkTable)
-                    ->where($fkName, $pemesanan->id)
-                    ->pluck('kursi_id')
-                    ->toArray();
-            }
-            
-            $pemesanan->kursis = Kursi::whereIn('id', $kursiIds)->get();
-
-            // 🔥 Update status otomatis jadi "selesai" kalau film sudah lewat
-            if ($pemesanan->jadwal && $pemesanan->jadwal->jam_tayang) {
-                $jamTayang = Carbon::parse($pemesanan->jadwal->jam_tayang);
-                $durasi = $pemesanan->jadwal->film->durasi ?? 120; // default 2 jam
-                $jamSelesai = $jamTayang->copy()->addMinutes($durasi);
-
-                if ($pemesanan->status_pembayaran === 'sudah_bayar' && now()->greaterThan($jamSelesai)) {
-                    $pemesanan->status_pembayaran = 'selesai';
-                }
-            }
-        }
+        // Load kursi dan update status
+        $this->loadSeatsAndUpdateStatus($riwayat);
         
         return view('pelanggan.akun', compact('user', 'riwayat', 'tab'));
     }
     
+    /**
+     * Update profil user
+     */
     public function update(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
             'phone' => 'nullable|string|max:20',
         ]);
@@ -73,6 +54,9 @@ class ProfileController extends Controller
         return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 
+    /**
+     * Ganti password user
+     */
     public function changePassword(Request $request)
     {
         $request->validate([
@@ -89,5 +73,70 @@ class ProfileController extends Controller
         ]);
 
         return redirect()->route('profile.index')->with('success', 'Password berhasil diubah!');
+    }
+
+    /**
+     * Hapus pemesanan yang expired (belum bayar > 10 menit)
+     */
+    private function deleteExpiredBookings($userId)
+    {
+        Pemesanan::where('user_id', $userId)
+            ->where('status_pembayaran', 'belum_bayar')
+            ->where('created_at', '<', now()->subMinutes(10))
+            ->delete();
+    }
+
+    /**
+     * Load kursi dan update status pemesanan
+     */
+    private function loadSeatsAndUpdateStatus($riwayat)
+    {
+        foreach ($riwayat as $pemesanan) {
+            // Load kursi
+            $pemesanan->kursis = $this->getBookingSeats($pemesanan->id);
+
+            // Update status jadi "selesai" kalau film sudah lewat
+            $this->updateBookingStatusIfExpired($pemesanan);
+        }
+    }
+
+    /**
+     * Ambil kursi dari pemesanan
+     */
+    private function getBookingSeats($pemesananId)
+    {
+        $pkTable = (new PemesananKursi())->getTable();
+        $fkName = Schema::hasColumn($pkTable, 'pemesanan_id') ? 'pemesanan_id' :
+                  (Schema::hasColumn($pkTable, 'booking_id') ? 'booking_id' : null);
+        
+        if (!$fkName) {
+            return collect([]);
+        }
+        
+        $kursiIds = DB::table($pkTable)
+            ->where($fkName, $pemesananId)
+            ->pluck('kursi_id')
+            ->toArray();
+        
+        return Kursi::whereIn('id', $kursiIds)->get();
+    }
+
+    /**
+     * Update status pemesanan jadi "selesai" kalau film sudah lewat
+     */
+    private function updateBookingStatusIfExpired($pemesanan)
+    {
+        if (!$pemesanan->jadwal || !$pemesanan->jadwal->jam_tayang) {
+            return;
+        }
+
+        $jamTayang = Carbon::parse($pemesanan->jadwal->jam_tayang);
+        $durasi = $pemesanan->jadwal->film->durasi ?? 120;
+        $jamSelesai = $jamTayang->copy()->addMinutes($durasi);
+
+        if ($pemesanan->status_pembayaran === 'sudah_bayar' && now()->greaterThan($jamSelesai)) {
+            $pemesanan->status_pembayaran = 'selesai';
+            $pemesanan->save();
+        }
     }
 }

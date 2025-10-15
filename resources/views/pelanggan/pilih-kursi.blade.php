@@ -116,16 +116,17 @@
                                                    @if($isTerjual || $isPending) disabled @endif>
                                             
                                             <div data-id="{{ $kursi->id }}"
-                                                 class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
-                                                 @if($isTerjual)
-                                                     bg-red-600/80 text-white cursor-not-allowed opacity-60
-                                                 @elseif($isPending)
-                                                     bg-yellow-500/80 text-black cursor-not-allowed opacity-60
-                                                 @else
-                                                     bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
-                                                 @endif">
-                                                {{ $kursi->kolom }}
-                                            </div>
+     data-nomor="{{ $kursi->nomor_kursi }}"
+     class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
+     @if($isTerjual)
+         bg-red-600/80 text-white cursor-not-allowed opacity-60
+     @elseif($isPending)
+         bg-yellow-500/80 text-black cursor-not-allowed opacity-60
+     @else
+         bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
+     @endif">
+    {{ $kursi->kolom }}
+</div>
                                             
                                             {{-- Tooltip --}}
                                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
@@ -236,7 +237,7 @@
                     </p>
                 </div>
             </div>
-
+            
         </div>
     </div>
 </div>
@@ -278,10 +279,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const selected = checkboxes.length;
         const total = selected * hargaTiket;
         
-        // Ambil nomor kursi yang dipilih
+        // Ambil nomor kursi yang dipilih (BARIS + KOLOM = nomor_kursi)
         const kursiTerpilih = Array.from(checkboxes).map(cb => {
             const kursiDiv = document.querySelector(`[data-id="${cb.value}"]`);
-            return kursiDiv ? kursiDiv.textContent.trim() : '';
+            return kursiDiv ? kursiDiv.getAttribute('data-nomor') : '';
         }).filter(k => k);
         
         const kursiText = kursiTerpilih.length > 0 ? kursiTerpilih.join(', ') : '-';

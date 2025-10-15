@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Film;
 use App\Models\Jadwal;
+use Illuminate\Support\Facades\DB;
 
 class FilmController extends Controller
 {
@@ -28,33 +29,59 @@ class FilmController extends Controller
 
     public function detail(Request $request, $id)
 {
-    // Cari film berdasarkan ID
     $film = Film::findOrFail($id);
-
-    // Ambil tanggal dari request, default hari ini
     $selectedDate = $request->get('date', now()->toDateString());
-    
-    // Validasi: hanya boleh hari ini atau besok
+
     $today = now()->toDateString();
     $tomorrow = now()->addDay()->toDateString();
-    
+
     if (!in_array($selectedDate, [$today, $tomorrow])) {
         $selectedDate = $today;
     }
 
-    // 🧠 Tambahkan logika auto-update status jadwal
+    // Update status jadwal lewat
     Jadwal::where('status_aktif', true)
         ->whereRaw("CONCAT(tanggal_tayang, ' ', jam_tayang) < NOW()")
         ->update(['status_aktif' => false]);
 
-    // Ambil jadwal per studio (group by studio)
     $jadwalsByStudio = Jadwal::with('studio')
         ->where('film_id', $id)
         ->where('tanggal_tayang', $selectedDate)
         ->where('status_aktif', true)
         ->orderBy('jam_tayang', 'asc')
         ->get()
-        ->groupBy('studio_id'); // Group berdasarkan studio
+        ->map(function ($jadwal) {
+            // Total kursi studio
+            $totalKursi = DB::table('kursis')
+                ->where('studio_id', $jadwal->studio_id)
+                ->count();
+
+            // Kursi terpesan (status sudah_bayar)
+            $kursiTerpesan = DB::table('pemesanan_kursis')
+                ->join('pemesanans', 'pemesanan_kursis.pemesanan_id', '=', 'pemesanans.id')
+                ->where('pemesanans.jadwal_id', $jadwal->id)
+                ->where('pemesanans.status_pembayaran', 'sudah_bayar')
+                ->count();
+
+            $jadwal->kursi_tersedia = $totalKursi - $kursiTerpesan;
+            $jadwal->kursi_penuh = $jadwal->kursi_tersedia <= 0;
+
+            // Parse datetime dengan aman
+            try {
+                // Coba parse jam_tayang langsung
+                $jadwalDateTime = \Carbon\Carbon::parse($jadwal->jam_tayang);
+                $jadwal->sudah_lewat = $jadwalDateTime->isPast();
+            } catch (\Exception $e) {
+                // Fallback: gabungkan manual
+                $tanggal = date('Y-m-d', strtotime($jadwal->tanggal_tayang));
+                $jam = date('H:i:s', strtotime($jadwal->jam_tayang));
+                $jadwalDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $tanggal . ' ' . $jam);
+                $jadwal->sudah_lewat = $jadwalDateTime->isPast();
+            }
+
+            return $jadwal;
+        })
+        ->groupBy('studio_id');
 
     return view('pelanggan.detail', compact('film', 'jadwalsByStudio', 'selectedDate'));
 }

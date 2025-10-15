@@ -95,6 +95,39 @@
                         </div>
                     </div>
 
+                    @if($pemesanan->status_pembayaran === 'belum_bayar')
+    @php
+        $expiredAt = \Carbon\Carbon::parse($pemesanan->created_at)->addMinutes(10);
+    @endphp
+    
+    <div class="bg-red-900/20 border border-red-500 rounded-xl p-4 mb-6">
+        <p class="text-sm text-red-200 text-center">
+            ⏰ Selesaikan pembayaran dalam <strong id="countdown" class="text-red-400 text-lg"></strong>
+        </p>
+    </div>
+
+    <script>
+        const expiredAt = new Date("{{ $expiredAt->toIso8601String() }}").getTime();
+        
+        const countdownInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = expiredAt - now;
+            
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('countdown').innerHTML = "EXPIRED!";
+                alert('Waktu pembayaran habis! Pemesanan akan dibatalkan.');
+                window.location.href = "{{ route('home') }}";
+                return;
+            }
+            
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdown').innerHTML = minutes + "m " + seconds + "s";
+        }, 1000);
+    </script>
+@endif
                     {{-- Detail Pesanan Card --}}
                     <div class="bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 rounded-2xl border border-neutral-800 shadow-xl overflow-hidden">
                         <div class="bg-gradient-to-r from-red-600/10 to-pink-600/10 border-b border-neutral-800 px-6 py-4">

@@ -36,43 +36,63 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="{{ route('admin.dashboard') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.dashboard') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
-            <a href="{{ route('admin.film.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.film*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-film"></i> Kelola Film
-            </a>
-            <a href="{{ route('admin.jadwal.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.jadwal*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-calendar-days"></i> Kelola Jadwal
-            </a>
-            <a href="{{ route('admin.studio.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.studio*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-couch"></i> Kelola Studio
-            </a>
-            <a href="{{ route('admin.pemesanan') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.pemesanan*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-ticket"></i> Pemesanan
-            </a>
-            <a href="{{ route('admin.pembayaran') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.pembayaran*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-money-bill-wave"></i> Pembayaran
-            </a>
+
+    {{-- Dashboard --}}
+    <a href="{{ route('admin.dashboard') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.dashboard') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+
+    {{-- Kelola Data Utama --}}
+    <a href="{{ route('admin.film.index') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.film*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-film"></i> Kelola Film
+    </a>
+    <a href="{{ route('admin.jadwal.index') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.jadwal*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-calendar-days"></i> Kelola Jadwal
+    </a>
+    <a href="{{ route('admin.studio.index') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.studio*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-couch"></i> Kelola Studio
+    </a>
+
+    {{-- Pemesanan & Pembayaran --}}
+    <a href="{{ route('admin.pemesanan') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.pemesanan*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-ticket"></i> Pemesanan
+    </a>
+    <a href="{{ route('admin.pembayaran') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.pembayaran*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-money-bill-wave"></i> Pembayaran
+    </a>
+
+    {{-- Submenu: Data Pengguna --}}
+    <div x-data="{ open: false }" class="space-y-1">
+        <button @click="open = !open" 
+                class="w-full flex items-center justify-between px-4 py-2 rounded-lg nav-item text-gray-300 hover:text-white">
+            <span class="flex items-center gap-3">
+                <i class="fa-solid fa-users"></i> Data Pengguna
+            </span>
+            <i :class="open ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="transition"></i>
+        </button>
+
+        <div x-show="open" x-transition class="pl-8 space-y-1">
             <a href="{{ route('admin.pelanggan.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.pelanggan*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-users"></i> Data Pelanggan
+               class="block px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-neutral-800/60 {{ request()->routeIs('admin.pelanggan*') ? 'text-red-400' : '' }}">
+                Pelanggan
             </a>
             <a href="{{ route('admin.kasir.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.kasir*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-users"></i> Data Kasir
+               class="block px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-neutral-800/60 {{ request()->routeIs('admin.kasir*') ? 'text-red-400' : '' }}">
+                Kasir
             </a>
             <a href="{{ route('admin.owner.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('admin.owner*') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-users"></i> Data Owner
+               class="block px-3 py-2 rounded-md text-gray-400 hover:text-white hover:bg-neutral-800/60 {{ request()->routeIs('admin.owner*') ? 'text-red-400' : '' }}">
+                Owner
             </a>
-        </nav>
+        </div>
+    </div>
+</nav>
     </aside>
 
     {{-- Konten utama --}}
