@@ -82,7 +82,7 @@
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button class="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition">
-                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
             </form>
         </div>

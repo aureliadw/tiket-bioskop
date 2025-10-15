@@ -12,50 +12,97 @@
         }
         
         @page {
-            size: 80mm auto;
+            size: 58mm auto;
             margin: 0;
         }
         
         body {
             font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            padding: 10mm;
-            width: 80mm;
+            font-size: 10px;
+            line-height: 1.3;
+            width: 58mm;
+            background: white;
         }
         
+        /* ✅ TIKET CONTAINER - 1 per halaman */
+        .ticket {
+            page-break-after: always;
+            padding: 8mm 4mm;
+            position: relative;
+        }
+        
+        .ticket:last-child {
+            page-break-after: avoid;
+        }
+        
+        /* Header */
         .header {
             text-align: center;
-            border-bottom: 2px dashed #000;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
         
         .header h1 {
-            font-size: 20px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
+            letter-spacing: 1px;
         }
         
         .header p {
-            font-size: 10px;
+            font-size: 8px;
+            color: #333;
         }
         
-        .section {
-            margin-bottom: 15px;
-        }
-        
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+        /* Booking Code */
+        .booking-code {
+            text-align: center;
             font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 8px 0;
+            padding: 6px;
+            border: 1px solid #000;
+            background: #f5f5f5;
+        }
+        
+        /* ✅ BARCODE - SAMA untuk semua tiket */
+        .barcode {
+            text-align: center;
+            margin: 8px 0;
+            padding: 4px 0;
+            background: white;
+        }
+        
+        .barcode svg {
+            width: 100%;
+            height: auto;
+            max-width: 45mm;
+        }
+        
+        /* Seat Highlight */
+        .seat-box {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 8px 0;
+            padding: 12px;
+            border: 2px solid #000;
+            background: #fff;
+            letter-spacing: 2px;
+        }
+        
+        /* Info Section */
+        .info {
+            font-size: 9px;
+            margin-bottom: 6px;
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .label {
@@ -64,91 +111,84 @@
         
         .value {
             text-align: right;
+            max-width: 55%;
+            word-wrap: break-word;
         }
         
-        .booking-code {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 15px 0;
-            padding: 10px;
-            border: 2px solid #000;
-            background: #f0f0f0;
+        /* Divider */
+        .divider {
+            border-top: 1px dashed #000;
+            margin: 6px 0;
         }
         
-        .seats {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 15px;
-            border: 3px double #000;
-            background: #f9f9f9;
-        }
-        
+        /* Footer */
         .footer {
-            border-top: 2px dashed #000;
-            padding-top: 10px;
-            margin-top: 15px;
+            border-top: 1px dashed #000;
+            padding-top: 6px;
+            margin-top: 8px;
             text-align: center;
-            font-size: 10px;
-        }
-        
-        .qr-code {
-            text-align: center;
-            margin: 15px 0;
-        }
-        
-        .total {
-            font-size: 14px;
-            font-weight: bold;
-            text-align: right;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #000;
+            font-size: 8px;
         }
         
         .note {
-            font-size: 9px;
-            font-style: italic;
-            margin-top: 10px;
-            padding: 8px;
+            font-size: 7px;
+            margin-top: 6px;
+            padding: 4px;
             border: 1px solid #ccc;
-            background: #f9f9f9;
+            background: #fafafa;
+            line-height: 1.4;
         }
         
         @media print {
-            body {
-                padding: 5mm;
+            .no-print {
+                display: none !important;
             }
             
-            .no-print {
-                display: none;
+            body {
+                background: white;
             }
         }
     </style>
 </head>
 <body>
+
+@php
+    $kursiList = $pemesanan->kursi;
+    $metadata = $pemesanan->metadata ? json_decode($pemesanan->metadata, true) : null;
+    $namaPelanggan = $metadata['nama_pelanggan'] ?? $pemesanan->user->nama_lengkap ?? 'Pelanggan';
+    $bookingCode = $pemesanan->kode_pemesanan;
+@endphp
+
+{{-- ✅ LOOP: 1 TIKET PER KURSI (tapi barcode sama semua) --}}
+@foreach($kursiList as $index => $kursi)
+<div class="ticket">
     
     <!-- Header -->
     <div class="header">
-        <h1>🎬 CINEMA POS</h1>
-        <p>Jl. Contoh No. 123, Jakarta</p>
-        <p>Telp: (021) 1234-5678</p>
+        <h1>🎬 HAPPYCINE</h1>
+        <p>Cinema Experience</p>
     </div>
     
     <!-- Booking Code -->
     <div class="booking-code">
-        {{ $pemesanan->kode_pemesanan }}
+        {{ $bookingCode }}
+    </div>
+    
+    <!-- ✅ BARCODE - SAMA untuk semua tiket -->
+    <div class="barcode">
+        <svg id="barcode-{{ $index }}"></svg>
+    </div>
+    
+    <!-- Seat Number (BIG) - BEDA tiap tiket -->
+    <div class="seat-box">
+        {{ $kursi->nomor_kursi }}
     </div>
     
     <!-- Film Info -->
-    <div class="section">
-        <div class="section-title">📽️ Informasi Film</div>
+    <div class="info">
         <div class="info-row">
             <span class="label">Film:</span>
-            <span class="value">{{ $pemesanan->jadwal->film->judul }}</span>
+            <span class="value">{{ Str::limit($pemesanan->jadwal->film->judul, 25) }}</span>
         </div>
         <div class="info-row">
             <span class="label">Studio:</span>
@@ -156,111 +196,93 @@
         </div>
         <div class="info-row">
             <span class="label">Tanggal:</span>
-            <span class="value">{{ date('d M Y', strtotime($pemesanan->jadwal->tanggal_tayang)) }}</span>
+            <span class="value">{{ \Carbon\Carbon::parse($pemesanan->jadwal->tanggal_tayang)->format('d M Y') }}</span>
         </div>
         <div class="info-row">
-            <span class="label">Waktu:</span>
-            <span class="value">{{ date('H:i', strtotime($pemesanan->jadwal->jam_tayang)) }} - {{ date('H:i', strtotime($pemesanan->jadwal->waktu_selesai)) }}</span>
+            <span class="label">Jam:</span>
+            <span class="value">{{ \Carbon\Carbon::parse($pemesanan->jadwal->jam_tayang)->format('H:i') }} WIB</span>
         </div>
     </div>
     
-    <!-- Seats -->
-    <div class="seats">
-        KURSI: {{ $pemesanan->kursi->pluck('nomor_kursi')->join(', ') }}
-    </div>
+    <div class="divider"></div>
     
-    <!-- Customer Info -->
-    <div class="section">
-        <div class="section-title">👤 Informasi Pelanggan</div>
-        @php
-            $metadata = $pemesanan->metadata ? json_decode($pemesanan->metadata, true) : null;
-        @endphp
-        
-        @if($metadata)
-            <div class="info-row">
-                <span class="label">Nama:</span>
-                <span class="value">{{ $metadata['nama_pelanggan'] ?? $pemesanan->user->nama_lengkap }}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">No. HP:</span>
-                <span class="value">{{ $metadata['no_hp_pelanggan'] ?? '-' }}</span>
-            </div>
-        @else
-            <div class="info-row">
-                <span class="label">Nama:</span>
-                <span class="value">{{ $pemesanan->user->nama_lengkap }}</span>
-            </div>
-        @endif
-    </div>
-    
-    <!-- Transaction Info -->
-    <div class="section">
-        <div class="section-title">💳 Informasi Transaksi</div>
+    <!-- Customer -->
+    <div class="info">
+        <div class="info-row">
+            <span class="label">Nama:</span>
+            <span class="value">{{ Str::limit($namaPelanggan, 20) }}</span>
+        </div>
         <div class="info-row">
             <span class="label">Tipe:</span>
             <span class="value">{{ $metadata && isset($metadata['tipe']) ? strtoupper($metadata['tipe']) : 'ONLINE' }}</span>
         </div>
-        @if($metadata && isset($metadata['metode_bayar']))
-        <div class="info-row">
-            <span class="label">Pembayaran:</span>
-            <span class="value">{{ strtoupper($metadata['metode_bayar']) }}</span>
-        </div>
-        @endif
-        <div class="info-row">
-            <span class="label">Tanggal Beli:</span>
-            <span class="value">{{ $pemesanan->created_at->format('d M Y H:i') }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Check-In:</span>
-            <span class="value">{{ $pemesanan->used_at ? $pemesanan->used_at->format('d M Y H:i') : '-' }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Petugas:</span>
-            <span class="value">{{ $pemesanan->usedBy->name ?? 'System' }}</span>
-        </div>
     </div>
     
+    <div class="divider"></div>
+    
     <!-- Total -->
-    <div class="total">
-        TOTAL: Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
+    <div class="info">
+        <div class="info-row">
+            <span class="label">Harga:</span>
+            <span class="value">Rp {{ number_format($kursi->harga ?? ($pemesanan->total_harga / $kursiList->count()), 0, ',', '.') }}</span>
+        </div>
     </div>
     
     <!-- Note -->
     <div class="note">
-        <strong>PENTING:</strong>
-        <br>• Datang 15 menit sebelum film dimulai
-        <br>• Simpan tiket ini sampai film selesai
-        <br>• Tiket tidak dapat dikembalikan
-        <br>• Dilarang membawa makanan/minuman dari luar
+        <strong>PENTING:</strong> Datang 15 menit sebelum film. Tunjukkan tiket ke petugas. Tiket tidak dapat dikembalikan.
     </div>
     
     <!-- Footer -->
     <div class="footer">
         <p>*** TERIMA KASIH ***</p>
         <p>Selamat Menikmati Film</p>
-        <p style="margin-top: 10px;">
-            Dicetak: {{ now()->format('d M Y H:i:s') }}
+        <p style="margin-top: 4px; font-size: 7px;">
+            Tiket {{ $index + 1 }} dari {{ $kursiList->count() }} | {{ now()->format('d/m/Y H:i') }}
         </p>
     </div>
     
-    <!-- Print Button (Hidden when printing) -->
-    <div class="no-print" style="text-align: center; margin-top: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 5px;">
-            🖨️ Cetak Tiket
-        </button>
-        <button onclick="window.close()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #666; color: white; border: none; border-radius: 5px; margin-left: 10px;">
-            Tutup
-        </button>
-    </div>
+</div>
+@endforeach
+
+<!-- Print Controls -->
+<div class="no-print" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 5px; margin-right: 10px; font-weight: bold;">
+        🖨️ Cetak {{ $kursiList->count() }} Tiket
+    </button>
+    <button onclick="window.close()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; background: #666; color: white; border: none; border-radius: 5px;">
+        Tutup
+    </button>
+</div>
+
+<!-- JsBarcode Library -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+    // ✅ Generate BARCODE YANG SAMA untuk semua tiket
+    const bookingCode = '{{ $bookingCode }}';
+    const kursiCount = {{ $kursiList->count() }};
     
-    <script>
-        // Auto print when page loads
-        window.onload = function() {
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        };
-    </script>
+    // Loop generate barcode untuk setiap tiket (tapi isinya sama)
+    for (let i = 0; i < kursiCount; i++) {
+        JsBarcode(`#barcode-${i}`, bookingCode, {
+            format: "CODE128",
+            width: 1.5,
+            height: 40,
+            displayValue: true,
+            fontSize: 10,
+            margin: 0,
+            background: "#ffffff"
+        });
+    }
     
+    // Auto print setelah 500ms
+    window.onload = function() {
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    };
+</script>
+
 </body>
 </html>
