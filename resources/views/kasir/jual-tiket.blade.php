@@ -37,7 +37,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($jadwals as $jadwal)
             <div class="bg-gray-900 border-2 border-gray-700 rounded-xl p-5 hover:border-green-500 cursor-pointer transition jadwal-card"
-                 onclick="selectJadwal({{ $jadwal->id }}, '{{ $jadwal->film->judul }}', '{{ $jadwal->studio->nama_studio }}', '{{ date('d M Y', strtotime($jadwal->tanggal)) }}', '{{ date('H:i', strtotime($jadwal->waktu_mulai)) }}')">
+                 onclick="selectJadwal({{ $jadwal->id }}, '{{ $jadwal->film->judul }}', '{{ $jadwal->studio->nama_studio }}', '{{ date('d M Y', strtotime($jadwal->tanggal_tayang)) }}', '{{ date('H:i', strtotime($jadwal->jam_tayang)) }}')">
                 
                 <div class="flex items-start gap-3 mb-4">
                     <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -56,19 +56,19 @@
                         <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>{{ date('d M Y', strtotime($jadwal->tanggal)) }}</span>
+                        <span>{{ date('d M Y', strtotime($jadwal->tanggal_tayang)) }}</span>
                     </div>
                     <div class="flex items-center text-sm">
                         <svg class="w-4 h-4 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>{{ date('H:i', strtotime($jadwal->waktu_mulai)) }} - {{ date('H:i', strtotime($jadwal->waktu_selesai)) }}</span>
+                        <span>{{ date('H:i', strtotime($jadwal->jam_tayang)) }}</span>
                     </div>
                     <div class="flex items-center text-sm">
                         <svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>Rp {{ number_format($jadwal->harga, 0, ',', '.') }}</span>
+                        <span>Rp {{ number_format($jadwal->harga_dasar, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>

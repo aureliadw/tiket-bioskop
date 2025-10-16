@@ -131,7 +131,7 @@ public function bulkCreate()
     $studios = Studio::where('status_aktif', true)->get();
     
     // Jam tayang default
-    $jamTersedia = ['11:30:00', '14:00:00', '16:30:00', '19:00:00', '21:30:00'];
+    $jamTersedia = ['11:30:00', '14:00:00', '16:30:00', '19:00:00', '21:30:00', '23:00:00'];
     
     return view('admin.jadwal.bulk', compact('films', 'studios', 'jamTersedia'));
 }

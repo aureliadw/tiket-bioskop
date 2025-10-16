@@ -124,19 +124,26 @@ class ProfileController extends Controller
     /**
      * Update status pemesanan jadi "selesai" kalau film sudah lewat
      */
-    private function updateBookingStatusIfExpired($pemesanan)
-    {
-        if (!$pemesanan->jadwal || !$pemesanan->jadwal->jam_tayang) {
-            return;
-        }
-
-        $jamTayang = Carbon::parse($pemesanan->jadwal->jam_tayang);
-        $durasi = $pemesanan->jadwal->film->durasi ?? 120;
-        $jamSelesai = $jamTayang->copy()->addMinutes($durasi);
-
-        if ($pemesanan->status_pembayaran === 'sudah_bayar' && now()->greaterThan($jamSelesai)) {
-            $pemesanan->status_pembayaran = 'selesai';
-            $pemesanan->save();
-        }
+    /**
+ * Update status pemesanan jadi "selesai" kalau film sudah lewat
+ */
+private function updateBookingStatusIfExpired($pemesanan)
+{
+    if (!$pemesanan->jadwal || !$pemesanan->jadwal->jam_tayang) {
+        return;
     }
+
+    $jamTayang = Carbon::parse($pemesanan->jadwal->jam_tayang);
+    $durasi = $pemesanan->jadwal->film->durasi ?? 120;
+    $jamSelesai = $jamTayang->copy()->addMinutes($durasi);
+
+    if ($pemesanan->status_pembayaran === 'sudah_bayar' && now()->greaterThan($jamSelesai)) {
+        // Update langsung ke database
+        Pemesanan::where('id', $pemesanan->id)
+            ->update(['status_pembayaran' => 'sudah_bayar']);
+        
+        // Sync property model
+        $pemesanan->status_pembayaran = 'sudah_bayar';
+    }
+}
 }

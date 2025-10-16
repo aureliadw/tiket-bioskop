@@ -224,7 +224,7 @@
     <div class="info">
         <div class="info-row">
             <span class="label">Harga:</span>
-            <span class="value">Rp {{ number_format($kursi->harga ?? ($pemesanan->total_harga / $kursiList->count()), 0, ',', '.') }}</span>
+            <span class="value">Rp {{ number_format($kursi->harga ?? ($pemesanan->total_bayar / $kursiList->count()), 0, ',', '.') }}</span>
         </div>
     </div>
     

@@ -167,7 +167,7 @@
                         </div>
                         <h3 class="text-xl font-bold mb-2">No Booking History</h3>
                         <p class="text-gray-400 mb-6">Start booking your favorite movies now!</p>
-                        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-bold shadow-lg shadow-red-600/30 transition-all hover:scale-105">
+                        <a href="{{ route('profile.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-bold shadow-lg shadow-red-600/30 transition-all hover:scale-105">
                             Browse Movies
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
