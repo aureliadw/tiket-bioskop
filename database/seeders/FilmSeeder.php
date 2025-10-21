@@ -27,7 +27,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Amanda Manopo, Reza Rahadian',
             'poster_image' => 'images/film8.jpg',
             'trailer_video' => 'https://youtu.be/IfkNOBDzFVM?si=BEO7RFJb4ChgT0FW',
-            'rating' => 8.0,
             'status' => 'sedang_tayang',
             'tanggal_rilis' => Carbon::parse('2025-01-10'),
         ]);
@@ -44,7 +43,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Tissa Biani, Refal Hady',
             'poster_image' => 'images/film9.jpg',
             'trailer_video' => 'https://youtu.be/tTMGGd9I3pg?si=irvIaEUL1nZ07VSu',
-            'rating' => 7.5,
             'status' => 'sedang_tayang',
             'tanggal_rilis' => Carbon::parse('2025-02-01'),
         ]);
@@ -61,7 +59,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Tara Basro, Ario Bayu',
             'poster_image' => 'images/film10.jpg',
             'trailer_video' => 'https://youtube.com/watch?v=sukma',
-            'rating' => 8.2,
             'status' => 'sedang_tayang',
             'tanggal_rilis' => Carbon::parse('2025-04-12'),
         ]);
@@ -78,7 +75,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Vera Farmiga, Patrick Wilson',
             'poster_image' => 'images/film3.jpg',
             'trailer_video' => 'https://youtube.com/watch?v=conjuring',
-            'rating' => 8.0,
             'status' => 'sedang_tayang',
             'tanggal_rilis' => Carbon::parse('2013-07-19'),
         ]);
@@ -95,7 +91,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Vera Farmiga, Patrick Wilson',
             'poster_image' => 'images/film7.jpg',
             'trailer_video' => 'https://youtu.be/otTjJZUFGl0?si=2MTtvcT9bm_uSuLr',
-            'rating' => 8.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-11-19'),
         ]);
@@ -112,7 +107,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Andre Taulany, Rigen Rakelna, Indra Jegel, Indro Warkop, Tora Sudiro, Davina Karamoy, Asri Welas, Indy Barends, Kenzy Taulany',
             'poster_image' => 'images/film6.jpg',
             'trailer_video' => 'https://youtu.be/vm_N0vdsDYU?si=bdXZzySBVx7mrKjo',
-            'rating' => 8.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-11-19'),
         ]);
@@ -129,7 +123,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Kikunosuke Toya, Reina Ueda, Tomori Kusunoki, Shiori Izawa, Shogo Sakata, Ai Fairouz, Karin Takahashi',
             'poster_image' => 'images/film4.jpg',
             'trailer_video' => 'https://youtu.be/EPaoHkV0dYw',
-            'rating' => 8.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2013-11-19'),
         ]);
@@ -146,7 +139,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Imelda Therine, Raihan Khan, Agus Kuncoro, Mike Lucock, Eduwart Manalu, Rory Asyari, Khalif Al Juna',
             'poster_image' => 'images/film11.jpg',
             'trailer_video' => 'https://youtu.be/EPaoHkV0dYw',
-            'rating' => 8.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-11-20'),
         ]);
@@ -163,7 +155,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Nicholas Saputra, Marsha Timothy, Adhisty Zara, Meriam Bellina, Marcella Zalianty, Teddy Syach, Roy Sungkono, Ariyo Wahab, Revalkdo, Hannah Al Rashid, Ayez Kassar, Devi Permatasari, Ringgo Ag',
             'poster_image' => 'images/film13.jpg',
             'trailer_video' => 'https://youtu.be/Mk6myHKi3MY?si=Ee0tTZcm1Jhfjcgi',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-11-20'),
         ]);
@@ -180,7 +171,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Titi Kamal, Darius Sinathrya, Sara Wijayanto, Nungki Kusumastuti, Egy Fedly, Ivonne Dahler, Agus Firmansyah, Tenno Ali, Bambang Oeban, Shafira Doyle, Muhammad Segaf, Bonifasius Jose',
             'poster_image' => 'images/film14.jpg',
             'trailer_video' => 'https://youtu.be/vbnON9APWvE?si=5N69uw1U8Kz31LB2',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-11-20'),
         ]);
@@ -197,7 +187,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Enzy Storia, Maxime Bouttier, Jourdy Pranata, Amanda Rigby, Tora Sudiro, Ersa Mayori, Agnes Naomi, Lukman Sardi, Arya Vasco, Nadine Emanuella, Izabel Jahja, Mike Lucock, Jerome Kurnia, Indian',
             'poster_image' => 'images/film15.jpg',
             'trailer_video' => 'https://youtu.be/zP5dvsKV4Ko?si=U2SvHHymCxQUtDEc',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-12-08'),
         ]);
@@ -214,7 +203,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Jourdy Pranata sebagai Gilang, Beby Tsabina sebagai Rachel Hesington, dan Kevin Julio sebagai Kevin Sumitro',
             'poster_image' => 'images/film16.jpg',
             'trailer_video' => 'https://youtu.be/IUMPOj9NcNQ?si=noK2ZUd7hdU-8rB5',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-12-23'),
         ]);
@@ -231,7 +219,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Vino G Bastian, Anya Geraldine, Niken Anjani, Nugie, Donny Alamsyah, Andri Mashadi, Rangga Natra, Dewi Gita, Rukman Rosadi',
             'poster_image' => 'images/film17.jpg',
             'trailer_video' => 'https://youtu.be/sOx_Nm-9XyM?si=rtqY0it4JtbwIRyc',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-12-11'),
         ]);
@@ -248,7 +235,6 @@ class FilmSeeder extends Seeder
             'pemain' => 'Rio Dewanto, Faradina Mufti, Vonny Anggraini, Nova Eliza, Gambit Saifullah, Jordan Omar, Sulthan Hamonangan, Tony Merle',
             'poster_image' => 'images/film18.jpg',
             'trailer_video' => 'https://youtu.be/sOx_Nm-9XyM?si=rtqY0it4JtbwIRyc',
-            'rating' => 7.0,
             'status' => 'akan_tayang',
             'tanggal_rilis' => Carbon::parse('2025-12-11'),
         ]);

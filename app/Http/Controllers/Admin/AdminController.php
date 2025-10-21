@@ -49,7 +49,7 @@ class AdminController extends Controller
         return view('admin.pembayaran.index', compact('pembayarans'));
     }
 
-    // Konfirmasi Pembayaran
+    /* Konfirmasi Pembayaran
     public function konfirmasiPembayaran($id)
     {
         $pembayaran = Pembayaran::findOrFail($id);
@@ -82,7 +82,7 @@ class AdminController extends Controller
         ]);
         
         return redirect()->back()->with('error', '❌ Pembayaran ditolak!');
-    }
+    }*/
 
     // ✅ LIST SEMUA PEMESANAN (ALL ORDERS)
     public function pemesanan(Request $request)

@@ -3,16 +3,17 @@
 @section('content')
 <div class="min-h-screen bg-neutral-950 text-white px-6 py-10">
     <div class="max-w-7xl mx-auto">
+        
         {{-- Header --}}
-<div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold text-red-500">Kelola Jadwal Film</h1>
-    <div class="flex gap-3">
-        <a href="{{ route('admin.jadwal.bulk.create') }}" 
-           class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-5 py-2 rounded-lg font-semibold transition shadow-lg">
-            <i class="fas fa-magic mr-2"></i>Bulk Input
-        </a>
-    </div>
-</div>
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-red-500">Kelola Jadwal Film</h1>
+            <div class="flex gap-3">
+                <a href="{{ route('admin.jadwal.bulk.create') }}" 
+                   class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2 rounded-lg font-semibold transition shadow-lg shadow-red-600/30">
+                    <i class="fas fa-magic mr-2"></i>Bulk Input
+                </a>
+            </div>
+        </div>
 
         {{-- Alert sukses --}}
         @if (session('success'))
@@ -37,16 +38,31 @@
                         <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
+
                 <tbody class="divide-y divide-neutral-800">
                     @forelse ($jadwals as $index => $jadwal)
                         <tr class="hover:bg-neutral-800/40 transition">
-                            <td class="px-6 py-4">{{ $loop->iteration + ($jadwals->currentPage() - 1) * $jadwals->perPage() }}</td>
-                            <td class="px-6 py-4 font-medium">{{ $jadwal->film->judul ?? '-' }}</td>
-                            <td class="px-6 py-4">{{ $jadwal->studio->nama_studio }}</td>
-                            <td class="px-6 py-4">{{ $jadwal->tanggal_tayang->format('d M Y') }}</td>
-                            <td class="px-6 py-4">{{ $jadwal->jam_tayang->format('H:i') }}</td>
-                            <td class="px-6 py-4">Rp {{ number_format($jadwal->harga_dasar, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4">{{ $jadwal->kursi_tersedia }}</td>
+                            <td class="px-6 py-4">
+                                {{ $loop->iteration + ($jadwals->currentPage() - 1) * $jadwals->perPage() }}
+                            </td>
+                            <td class="px-6 py-4 font-medium">
+                                {{ $jadwal->film->judul ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $jadwal->studio->nama_studio }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $jadwal->tanggal_tayang->format('d M Y') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $jadwal->jam_tayang->format('H:i') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                Rp {{ number_format($jadwal->harga_dasar, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $jadwal->kursi_tersedia }}
+                            </td>
                             <td class="px-6 py-4">
                                 @if ($jadwal->status_aktif)
                                     <span class="bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-xs">Aktif</span>
@@ -87,6 +103,7 @@
         <div class="mt-6">
             {{ $jadwals->links('pagination::tailwind') }}
         </div>
+
     </div>
 </div>
 @endsection

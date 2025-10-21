@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\KelolaPelangganController;
 use App\Http\Controllers\Admin\KelolaKasirController;
 use App\Http\Controllers\Admin\KelolaOwnerController;
 use App\Http\Controllers\Kasir\KasirController;
+use App\Http\Controllers\Owner\OwnerController;
 use App\Http\Controllers\TiketController;
 
 /*
@@ -68,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/akun/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/akun/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::delete('/profile/delete', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/tiket/{pemesanan_id}', [PembayaranController::class, 'showTiket'])->name('pelanggan.tiket');
 
@@ -85,8 +87,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Verifikasi Pembayaran
     Route::get('/pembayaran', [AdminController::class, 'pembayaran'])->name('pembayaran');
-    Route::post('/pembayaran/{id}/konfirmasi', [AdminController::class, 'konfirmasiPembayaran'])->name('pembayaran.konfirmasi');
-    Route::post('/pembayaran/{id}/tolak', [AdminController::class, 'tolakPembayaran'])->name('pembayaran.tolak');
     
     // ✅ PEMESANAN (Update ini)
     Route::get('/pemesanan', [AdminController::class, 'pemesanan'])->name('pemesanan');
@@ -110,6 +110,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->group(function () {
     Route::get('/dashboard', [KasirController::class, 'dashboard'])->name('kasir.dashboard');
     
+    Route::get('/verifikasi-pembayaran', [KasirController::class, 'verifikasiPembayaran'])->name('kasir.verifikasi');
+    Route::post('/pembayaran/{id}/konfirmasi', [KasirController::class, 'konfirmasiPembayaran'])->name('kasir.pembayaran.konfirmasi');
+    Route::post('/pembayaran/{id}/tolak', [KasirController::class, 'tolakPembayaran'])->name('kasir.pembayaran.tolak');
+
     // Check-In
     Route::get('/check-in', [KasirController::class, 'checkInPage'])->name('kasir.checkin');
     Route::post('/check-in/code', [KasirController::class, 'checkByCode'])->name('kasir.checkin.code');
@@ -126,8 +130,9 @@ Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->group(function () {
 });
 
 // Owner
-Route::middleware(['auth', 'role:owner'])->group(function () {
-    Route::get('/owner/dashboard', function () {
-        return view('owner.dashboard');
-    })->name('owner.dashboard');
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->group(function () {
+    Route::get('/dashboard', [OwnerController::class, 'index'])->name('owner.dashboard');
+    Route::get('/revenue-report', [OwnerController::class, 'revenueReport'])->name('owner.revenue.report');
+    Route::get('/film-performance', [OwnerController::class, 'filmPerformance'])->name('owner.film.performance');
+    Route::get('/export-pdf', [OwnerController::class, 'exportPDF'])->name('owner.export.pdf');
 });

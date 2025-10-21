@@ -14,9 +14,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * Proses login
-     */
     public function login(Request $request)
     {
         // Validation

@@ -19,20 +19,76 @@
             background: linear-gradient(to right, rgba(239,68,68,0.25), transparent);
             border-left: 3px solid #ef4444;
         }
+
+    .logo-cinema {
+        font-family: 'Righteous', cursive;
+        font-size: 1.3rem;
+        letter-spacing: 0.05em;
+        background: linear-gradient(135deg, #fff 0%, #e5e5e5 50%, #fff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
+        transition: all 0.3s ease;
+    }
+    .logo-cinema:hover {
+        filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8));
+    }
+    .logo-accent {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .film-strip {
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            transparent 20%, 
+            rgba(239, 68, 68, 0.3) 20%, 
+            rgba(239, 68, 68, 0.3) 40%, 
+            transparent 40%, 
+            transparent 60%, 
+            rgba(239, 68, 68, 0.3) 60%, 
+            rgba(239, 68, 68, 0.3) 80%, 
+            transparent 80%);
+        height: 2px;
+        width: 100%;
+    }
     </style>
 </head>
 <body class="bg-neutral-950 text-white flex min-h-screen font-inter">
 
     {{-- Sidebar --}}
     <aside class="w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col">
-        <div class="px-6 py-5 border-b border-neutral-800 flex items-center space-x-2">
-            <span class="text-2xl font-extrabold tracking-wide flex items-center">
-                <span class="text-red-600">H</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white mx-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l2.39 7.26h7.63l-6.18 4.49 2.36 7.25L12 16.77l-6.2 4.23 2.36-7.25L2 9.26h7.61z"/>
-                </svg>
-                <span class="text-red-600">APPY</span><span class="text-red-600">CINE</span>
-            </span>
+        <div class="px-6 py-6 border-b border-neutral-800 flex items-center gap-3">
+    {{-- Film Reel Icon --}}
+    <div class="relative">
+        <!-- Rotating outer ring -->
+        <div class="absolute inset-0 rounded-full border-2 border-red-500/30 transition-all group-hover:border-red-500/60 duration-700"></div>
+        
+        <!-- Center circle -->
+        <div class="relative w-10 h-10 bg-gradient-to-br from-red-600 via-red-700 to-red-900 rounded-full flex items-center justify-center shadow-lg shadow-red-500/50">
+            <!-- Film holes -->
+            <div class="absolute top-1 left-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
+            <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
+            <div class="absolute bottom-1 left-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
+            <div class="absolute bottom-1 right-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
+            
+            <!-- Play button -->
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </div>
+    </div>
+
+    {{-- Logo Text --}}
+    <div class="flex flex-col -space-y-1">
+        <div class="flex items-center gap-0">
+            <span class="logo-cinema">HAPPY</span>
+            <span class="logo-cinema logo-accent">CINE</span>
+        </div>
+        <div class="film-strip"></div>
+    </div>
+</div>
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2 text-sm">

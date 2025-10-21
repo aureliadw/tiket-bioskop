@@ -133,7 +133,6 @@
             Create Account
           </button>
 
-          {{-- Login Link --}}
           <div class="mt-6 text-center">
             <p class="text-gray-400 text-sm">
               Already have an account? 
@@ -146,6 +145,5 @@
       </div>
     </div>
   </div>
-
 </body>
 </html>

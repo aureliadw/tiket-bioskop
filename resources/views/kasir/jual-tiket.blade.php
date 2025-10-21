@@ -30,51 +30,125 @@
         </div>
     </div>
 
-    <!-- STEP 1: Pilih Jadwal -->
-    <div id="step1" class="bg-gray-800 rounded-2xl p-6 shadow-xl">
-        <h2 class="text-2xl font-bold mb-4">1️⃣ Pilih Film & Jadwal</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @foreach($jadwals as $jadwal)
-            <div class="bg-gray-900 border-2 border-gray-700 rounded-xl p-5 hover:border-green-500 cursor-pointer transition jadwal-card"
-                 onclick="selectJadwal({{ $jadwal->id }}, '{{ $jadwal->film->judul }}', '{{ $jadwal->studio->nama_studio }}', '{{ date('d M Y', strtotime($jadwal->tanggal_tayang)) }}', '{{ date('H:i', strtotime($jadwal->jam_tayang)) }}')">
+<!-- STEP 1: Pilih Jadwal -->
+<div id="step1" class="bg-gray-800 rounded-2xl p-6 shadow-xl">
+    <h2 class="text-2xl font-bold mb-6 text-white">1️⃣ Pilih Film & Jadwal</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        @foreach($jadwals as $jadwal)
+            @php
+                $tanggal = $jadwal->tanggal_tayang instanceof \Carbon\Carbon 
+                    ? $jadwal->tanggal_tayang->format('Y-m-d') 
+                    : $jadwal->tanggal_tayang;
+
+                $jam = $jadwal->jam_tayang instanceof \Carbon\Carbon 
+                    ? $jadwal->jam_tayang->format('H:i:s') 
+                    : $jadwal->jam_tayang;
+
+                $jadwalDateTime = \Carbon\Carbon::parse($tanggal . ' ' . $jam);
+                $isPast = $jadwalDateTime->isPast();
+                $minutesUntil = now()->diffInMinutes($jadwalDateTime, false);
+            @endphp
+
+            <!-- 🎬 Card Jadwal -->
+            <div class="relative bg-gray-900 rounded-xl p-5 border-2 transition-all duration-300 flex flex-col justify-between h-full
+                        {{ $isPast ? 'border-red-700/50 opacity-60' : 'border-gray-700 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/20' }}">
                 
+                {{-- Overlay jika jadwal sudah lewat --}}
+                @if($isPast)
+                    <div class="absolute inset-0 bg-black/50 rounded-xl backdrop-blur-[2px] z-20 flex items-center justify-center pointer-events-none">
+                        <div class="bg-red-900/95 px-6 py-3 rounded-lg border-2 border-red-500 shadow-xl">
+                            <span class="text-white font-bold text-base">🚫 Jadwal Sudah Lewat</span>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Bar Badge --}}
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    @if($jadwal->is_weekend)
+                        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full border border-blue-400">
+                            🎉 WEEKEND +Rp10K
+                        </span>
+                    @endif
+
+                    @if($isPast)
+                        <span class="bg-red-900 text-red-200 text-xs font-bold px-3 py-1 rounded-full border border-red-700">
+                            ⏱️ LEWAT
+                        </span>
+                    @elseif($minutesUntil <= 30 && $minutesUntil > 0)
+                        <span class="bg-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full border border-yellow-500 animate-pulse">
+                            🔔 {{ $minutesUntil }} MENIT LAGI
+                        </span>
+                    @else
+                        <span class="bg-green-900 text-green-200 text-xs font-bold px-3 py-1 rounded-full border border-green-700">
+                            ✅ AKTIF
+                        </span>
+                    @endif
+                </div>
+
+                {{-- Info Film --}}
                 <div class="flex items-start gap-3 mb-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-lg mb-1 truncate">{{ $jadwal->film->judul }}</h3>
+                        <h3 class="font-bold text-lg text-white truncate" title="{{ $jadwal->film->judul }}">
+                            {{ $jadwal->film->judul }}
+                        </h3>
                         <p class="text-sm text-gray-400">{{ $jadwal->studio->nama_studio }}</p>
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <div class="flex items-center text-sm">
-                        <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                {{-- Detail Waktu & Harga --}}
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center text-sm text-gray-300">
+                        <svg class="w-4 h-4 mr-2 {{ $isPast ? 'text-red-400' : 'text-purple-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>{{ date('d M Y', strtotime($jadwal->tanggal_tayang)) }}</span>
+                        <span class="{{ $isPast ? 'text-red-400 line-through' : 'text-gray-300' }}">
+                            {{ date('H:i', strtotime($jadwal->jam_tayang)) }} WIB
+                        </span>
                     </div>
-                    <div class="flex items-center text-sm">
-                        <svg class="w-4 h-4 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>{{ date('H:i', strtotime($jadwal->jam_tayang)) }}</span>
-                    </div>
-                    <div class="flex items-center text-sm">
+
+                    <div class="flex items-center text-sm text-gray-300">
                         <svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8
+                                   c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1
+                                   m0-1c-1.11 0-2.08-.402-2.599-1
+                                   M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>Rp {{ number_format($jadwal->harga_dasar, 0, ',', '.') }}</span>
+                        Rp {{ number_format($jadwal->harga_final ?? $jadwal->harga_dasar, 0, ',', '.') }}
                     </div>
                 </div>
+
+                {{-- Tombol --}}
+                @if($isPast)
+                    <button disabled class="bg-gray-800 text-gray-600 font-semibold py-2 rounded-lg text-sm flex items-center justify-center gap-2 border border-gray-700 cursor-not-allowed">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Tidak Tersedia
+                    </button>
+                @else
+                    <a href="{{ route('kasir.jual-tiket') }}?jadwal_id={{ $jadwal->id }}"
+                        class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/40">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                        Pilih Jadwal
+                    </a>
+                @endif
             </div>
-            @endforeach
-        </div>
+        @endforeach
     </div>
+</div>
 
     <!-- STEP 2: Pilih Kursi -->
     <div id="step2" class="bg-gray-800 rounded-2xl p-6 shadow-xl hidden">
@@ -158,15 +232,15 @@
                 <label class="block text-sm font-semibold mb-2">Metode Pembayaran <span class="text-red-500">*</span></label>
                 <div class="grid grid-cols-3 gap-3">
                     <label class="flex items-center justify-center px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-xl cursor-pointer hover:border-green-500 transition has-[:checked]:border-green-500 has-[:checked]:bg-green-900/20">
-                        <input type="radio" name="metode_bayar" value="cash" class="mr-2" required>
+                        <input type="radio" name="metode_bayar" value="tunai" class="mr-2" required>
                         <span class="font-semibold">💵 Cash</span>
                     </label>
                     <label class="flex items-center justify-center px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-xl cursor-pointer hover:border-green-500 transition has-[:checked]:border-green-500 has-[:checked]:bg-green-900/20">
-                        <input type="radio" name="metode_bayar" value="debit" class="mr-2" required>
-                        <span class="font-semibold">💳 Debit</span>
+                        <input type="radio" name="metode_bayar" value="transfer_bank" class="mr-2" required>
+                        <span class="font-semibold">💳 Transfer Bank</span>
                     </label>
                     <label class="flex items-center justify-center px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-xl cursor-pointer hover:border-green-500 transition has-[:checked]:border-green-500 has-[:checked]:bg-green-900/20">
-                        <input type="radio" name="metode_bayar" value="qris" class="mr-2" required>
+                        <input type="radio" name="metode_bayar" value="e_wallet" class="mr-2" required>
                         <span class="font-semibold">📱 QRIS</span>
                     </label>
                 </div>
@@ -239,38 +313,72 @@ function renderKursiGrid() {
     
     Object.keys(rows).sort().forEach(row => {
         const rowDiv = document.createElement('div');
-        rowDiv.className = 'flex gap-2 items-center';
+        rowDiv.className = 'flex gap-2 items-center justify-center'; // ✅ Tambah justify-center
         
-        // Row label
-        const label = document.createElement('span');
-        label.className = 'w-8 text-center font-bold text-gray-400';
-        label.textContent = row;
-        rowDiv.appendChild(label);
+        // Row label (kiri)
+        const labelLeft = document.createElement('span');
+        labelLeft.className = 'w-8 text-center font-bold text-gray-400';
+        labelLeft.textContent = row;
+        rowDiv.appendChild(labelLeft);
         
-        // Seats
-        rows[row].forEach(kursi => {
-            const seat = document.createElement('button');
-            seat.type = 'button';
-            seat.className = 'w-10 h-10 rounded font-semibold text-sm transition';
-            seat.textContent = kursi.nomor_kursi.slice(1);
-            
-            if (kursi.status === 'booked') {
-                seat.className += ' bg-red-900 border border-red-700 opacity-50 cursor-not-allowed';
-                seat.disabled = true;
-            } else if (selectedKursiIds.includes(kursi.id)) {
-                seat.className += ' bg-green-600 border border-green-500';
-            } else {
-                seat.className += ' bg-gray-700 border border-gray-600 hover:border-green-500';
-            }
-            
-            seat.onclick = () => toggleKursi(kursi.id);
+        // ✅ SPLIT KURSI: Kiri & Kanan (buat jalan tengah)
+        const kursiRow = rows[row].sort((a, b) => {
+            const numA = parseInt(a.nomor_kursi.slice(1));
+            const numB = parseInt(b.nomor_kursi.slice(1));
+            return numA - numB;
+        });
+        
+        const totalKursi = kursiRow.length;
+        const leftSeats = kursiRow.slice(0, Math.ceil(totalKursi / 2));
+        const rightSeats = kursiRow.slice(Math.ceil(totalKursi / 2));
+        
+        // Kursi Kiri
+        leftSeats.forEach(kursi => {
+            const seat = createSeatButton(kursi);
             rowDiv.appendChild(seat);
         });
+        
+        // ✅ JALAN TENGAH (SPACE)
+        const aisle = document.createElement('div');
+        aisle.className = 'w-12'; // Space kosong
+        rowDiv.appendChild(aisle);
+        
+        // Kursi Kanan
+        rightSeats.forEach(kursi => {
+            const seat = createSeatButton(kursi);
+            rowDiv.appendChild(seat);
+        });
+        
+        // Row label (kanan)
+        const labelRight = document.createElement('span');
+        labelRight.className = 'w-8 text-center font-bold text-gray-400';
+        labelRight.textContent = row;
+        rowDiv.appendChild(labelRight);
         
         grid.appendChild(rowDiv);
     });
     
     updateSummary();
+}
+
+// ✅ Helper function untuk buat button kursi
+function createSeatButton(kursi) {
+    const seat = document.createElement('button');
+    seat.type = 'button';
+    seat.className = 'w-10 h-10 rounded font-semibold text-sm transition';
+    seat.textContent = kursi.nomor_kursi.slice(1);
+    
+    if (kursi.status === 'booked') {
+        seat.className += ' bg-red-900 border border-red-700 opacity-50 cursor-not-allowed';
+        seat.disabled = true;
+    } else if (selectedKursiIds.includes(kursi.id)) {
+        seat.className += ' bg-green-600 border border-green-500';
+    } else {
+        seat.className += ' bg-gray-700 border border-gray-600 hover:border-green-500';
+    }
+    
+    seat.onclick = () => toggleKursi(kursi.id);
+    return seat;
 }
 
 function toggleKursi(kursiId) {

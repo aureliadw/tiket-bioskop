@@ -2,31 +2,52 @@
 
 @section('content')
 <div class="relative min-h-screen bg-neutral-950 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4">
-        
-        {{-- Header Film --}}
+    <div class="max-w-6xl mx-auto px-4">
+
+        {{-- ============================================
+             HITUNG HARGA TIKET (WEEKEND = 45K)
+             ============================================ 
+        --}}
+        @php
+            use Carbon\Carbon;
+            $tanggalTayang = Carbon::parse($jadwal->tanggal_tayang);
+            $isWeekend = $tanggalTayang->isWeekend();
+            $hargaFinal = $isWeekend ? 45000 : $jadwal->harga_dasar;
+        @endphp
+
+        {{-- ============================================
+             HEADER: INFO FILM & JADWAL
+             ============================================ 
+        --}}
         <div class="text-center mb-8">
             <h1 class="text-3xl lg:text-4xl font-extrabold mb-2 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                 {{ strtoupper($jadwal->film->judul) }}
             </h1>
             <p class="text-gray-400">
                 {{ $jadwal->studio->nama_studio ?? 'Studio 1' }} • 
-                {{ \Carbon\Carbon::parse($jadwal->tanggal_tayang)->translatedFormat('d M Y') }} • 
-                {{ \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i') }} WIB
+                {{ Carbon::parse($jadwal->tanggal_tayang)->translatedFormat('d M Y') }} • 
+                {{ Carbon::parse($jadwal->jam_tayang)->format('H:i') }} WIB
             </p>
         </div>
 
+        {{-- ============================================
+             GRID LAYOUT: KURSI (KIRI) + SUMMARY (KANAN)
+             ============================================ 
+        --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {{-- Kolom Kiri: Area Kursi --}}
+            {{-- ============================================
+                 KOLOM KIRI: AREA PEMILIHAN KURSI
+                 ============================================ 
+            --}}
             <div class="lg:col-span-2">
                 
-                {{-- Screen dengan Efek Cahaya --}}
+                {{-- SCREEN / LAYAR dengan Efek Cahaya --}}
                 <div class="relative mb-12">
-                    {{-- Cahaya dari Screen --}}
+                    {{-- Efek cahaya dari layar --}}
                     <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-yellow-500/20 via-yellow-500/5 to-transparent blur-3xl"></div>
                     
-                    {{-- Screen --}}
+                    {{-- Layar bioskop --}}
                     <div class="relative w-4/5 mx-auto h-3 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 rounded-t-2xl shadow-2xl border-t-2 border-x-2 border-gray-700/50">
                         <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-t-2xl"></div>
                     </div>
@@ -35,33 +56,39 @@
                     </div>
                 </div>
 
-                {{-- Form Kursi --}}
+                {{-- FORM PEMILIHAN KURSI --}}
                 <form action="{{ route('pelanggan.proses-kursi', $jadwal->id) }}" method="POST" id="formKursi">
                     @csrf
                     
-                    {{-- Grid Kursi dengan Gang Tengah --}}
+                    {{-- ============================================
+                         GRID KURSI dengan GANG TENGAH
+                         ============================================
+                         Layout: [Baris] [5 Kursi Kiri] [Gang] [5 Kursi Kanan] [Baris]
+                    --}}
                     <div class="bg-gradient-to-b from-neutral-900/50 to-neutral-950 rounded-2xl border border-neutral-800/50 p-8">
                         @php
-                            // Group kursi berdasarkan baris
                             $kursiByRow = $kursis->groupBy('baris');
-                            $colsPerSide = 5; // 5 kursi kiri, 5 kursi kanan (untuk total 10 kolom)
+                            $colsPerSide = 5; // 5 kursi per sisi (total 10 kolom)
                         @endphp
 
                         @foreach($kursiByRow as $baris => $kursisBaris)
                             <div class="flex items-center justify-center gap-4 mb-3">
-                                {{-- Label Baris Kiri --}}
+                                
+                                {{-- Label Baris (Kiri) --}}
                                 <div class="w-6 text-center text-xs font-bold text-gray-500">
                                     {{ $baris }}
                                 </div>
 
-                                {{-- Kursi Sisi Kiri (Kolom 1-5) --}}
+                                {{-- KURSI SISI KIRI (Kolom 1-5) --}}
                                 <div class="flex gap-2">
                                     @foreach($kursisBaris->sortBy('kolom')->take($colsPerSide) as $kursi)
                                         @php
                                             $isTerjual = in_array($kursi->id, $kursiTerjual ?? []);
                                             $isPending = in_array($kursi->id, $kursiPending ?? []);
                                         @endphp
+                                        
                                         <div class="relative group">
+                                            {{-- Hidden Checkbox --}}
                                             <input type="checkbox" 
                                                    name="kursi[]" 
                                                    value="{{ $kursi->id }}" 
@@ -69,20 +96,21 @@
                                                    id="kursi-{{ $kursi->id }}"
                                                    @if($isTerjual || $isPending) disabled @endif>
                                             
+                                            {{-- Visual Kursi (Clickable) --}}
                                             <div data-id="{{ $kursi->id }}"
-     data-nomor="{{ $kursi->nomor_kursi }}"
-     class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
-     @if($isTerjual)
-         bg-red-600/80 text-white cursor-not-allowed opacity-60
-     @elseif($isPending)
-         bg-yellow-500/80 text-black cursor-not-allowed opacity-60
-     @else
-         bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
-     @endif">
-    {{ $kursi->kolom }}
-</div>
+                                                 data-nomor="{{ $kursi->nomor_kursi }}"
+                                                 class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
+                                                 @if($isTerjual)
+                                                     bg-red-600/80 text-white cursor-not-allowed opacity-60
+                                                 @elseif($isPending)
+                                                     bg-yellow-500/80 text-black cursor-not-allowed opacity-60
+                                                 @else
+                                                     bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
+                                                 @endif">
+                                                {{ $kursi->kolom }}
+                                            </div>
                                           
-                                            {{-- Tooltip --}}
+                                            {{-- Tooltip (Hover Info) --}}
                                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                                                 @if($isTerjual)
                                                     Terjual
@@ -96,19 +124,21 @@
                                     @endforeach
                                 </div>
 
-                                {{-- GANG TENGAH --}}
+                                {{-- GANG TENGAH (Separator) --}}
                                 <div class="w-12 flex items-center justify-center">
                                     <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-600/30 to-transparent"></div>
                                 </div>
 
-                                {{-- Kursi Sisi Kanan (Kolom 6-10) --}}
+                                {{-- KURSI SISI KANAN (Kolom 6-10) --}}
                                 <div class="flex gap-2">
                                     @foreach($kursisBaris->sortBy('kolom')->skip($colsPerSide) as $kursi)
                                         @php
                                             $isTerjual = in_array($kursi->id, $kursiTerjual ?? []);
                                             $isPending = in_array($kursi->id, $kursiPending ?? []);
                                         @endphp
+                                        
                                         <div class="relative group">
+                                            {{-- Hidden Checkbox --}}
                                             <input type="checkbox" 
                                                    name="kursi[]" 
                                                    value="{{ $kursi->id }}" 
@@ -116,20 +146,21 @@
                                                    id="kursi-{{ $kursi->id }}"
                                                    @if($isTerjual || $isPending) disabled @endif>
                                             
+                                            {{-- Visual Kursi (Clickable) --}}
                                             <div data-id="{{ $kursi->id }}"
-     data-nomor="{{ $kursi->nomor_kursi }}"
-     class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
-     @if($isTerjual)
-         bg-red-600/80 text-white cursor-not-allowed opacity-60
-     @elseif($isPending)
-         bg-yellow-500/80 text-black cursor-not-allowed opacity-60
-     @else
-         bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
-     @endif">
-    {{ $kursi->kolom }}
-</div>
+                                                 data-nomor="{{ $kursi->nomor_kursi }}"
+                                                 class="kursi w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer
+                                                 @if($isTerjual)
+                                                     bg-red-600/80 text-white cursor-not-allowed opacity-60
+                                                 @elseif($isPending)
+                                                     bg-yellow-500/80 text-black cursor-not-allowed opacity-60
+                                                 @else
+                                                     bg-blue-600 text-white hover:bg-blue-500 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50
+                                                 @endif">
+                                                {{ $kursi->kolom }}
+                                            </div>
                                             
-                                            {{-- Tooltip --}}
+                                            {{-- Tooltip (Hover Info) --}}
                                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                                                 @if($isTerjual)
                                                     Terjual
@@ -143,7 +174,7 @@
                                     @endforeach
                                 </div>
 
-                                {{-- Label Baris Kanan --}}
+                                {{-- Label Baris (Kanan) --}}
                                 <div class="w-6 text-center text-xs font-bold text-gray-500">
                                     {{ $baris }}
                                 </div>
@@ -151,7 +182,10 @@
                         @endforeach
                     </div>
 
-                    {{-- Legend --}}
+                    {{-- ============================================
+                         LEGEND (KETERANGAN WARNA KURSI)
+                         ============================================ 
+                    --}}
                     <div class="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm bg-neutral-900/80 backdrop-blur-sm rounded-xl p-4 border border-neutral-800/50">
                         <div class="flex items-center gap-2">
                             <div class="w-6 h-6 rounded-lg bg-blue-600 shadow-md"></div>
@@ -173,13 +207,16 @@
                 </form>
             </div>
 
-            {{-- Kolom Kanan: Summary Card --}}
+            {{-- ============================================
+                 KOLOM KANAN: SUMMARY CARD (STICKY)
+                 ============================================ 
+            --}}
             <div class="lg:col-span-1">
                 <div class="bg-gradient-to-br from-neutral-900 to-neutral-950 rounded-2xl shadow-2xl border border-neutral-800/50 sticky top-24 p-6">
                     
-                    {{-- Poster & Info --}}
+                    {{-- Poster Film & Info Mini --}}
                     <div class="flex gap-4 mb-6 pb-6 border-b border-neutral-800">
-                        {{-- Poster --}}
+                        {{-- Poster Thumbnail --}}
                         <div class="flex-shrink-0">
                             <div class="relative overflow-hidden rounded-lg shadow-xl w-20 h-28">
                                 <img src="{{ asset('storage/' . $jadwal->film->poster_image) }}" 
@@ -188,34 +225,36 @@
                             </div>
                         </div>
 
-                        {{-- Info --}}
+                        {{-- Info Singkat --}}
                         <div class="flex-1">
-                            <h2 class="text-sm font-bold mb-1">{{ $jadwal->film->judul }}</h2>
+                            <h2 class="text-sm font-bold mb-1 line-clamp-2">{{ $jadwal->film->judul }}</h2>
                             <div class="space-y-1 text-xs text-gray-400">
                                 <p>{{ $jadwal->studio->nama_studio ?? 'Studio 1' }}</p>
-                                <p>{{ \Carbon\Carbon::parse($jadwal->tanggal_tayang)->format('d M Y') }}</p>
-                                <p>{{ \Carbon\Carbon::parse($jadwal->jam_tayang)->format('H:i') }}</p>
+                                <p>{{ Carbon::parse($jadwal->tanggal_tayang)->format('d M Y') }}</p>
+                                <p>{{ Carbon::parse($jadwal->jam_tayang)->format('H:i') }}</p>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Kursi Terpilih --}}
-                    <div class="mb-6 p-4 bg-neutral-800/50 rounded-xl">
-                        <div class="flex items-center justify-between mb-2">
+                    {{-- Detail Kursi Terpilih --}}
+                    <div class="mb-6 p-4 bg-neutral-800/50 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-400">Kursi Dipilih</span>
                             <span id="kursiDipilih" class="text-sm font-bold text-green-400">-</span>
                         </div>
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-400">Jumlah Tiket</span>
                             <span id="jumlahTiket" class="text-sm font-bold text-white">0</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-400">Harga/Tiket</span>
-                            <span class="text-sm font-semibold text-white">Rp {{ number_format($jadwal->harga_dasar, 0, ',', '.') }}</span>
+                            <span class="text-sm font-semibold text-white">
+                                Rp {{ number_format($hargaFinal, 0, ',', '.') }}
+                            </span>
                         </div>
                     </div>
 
-                    {{-- Total --}}
+                    {{-- Total Pembayaran --}}
                     <div class="mb-6 p-5 bg-gradient-to-br from-green-500/10 to-emerald-600/5 rounded-xl border border-green-500/20">
                         <p class="text-xs text-gray-400 mb-1">Total Pembayaran</p>
                         <p class="text-3xl font-black text-green-400">
@@ -232,7 +271,7 @@
                         Lanjut ke Pembayaran
                     </button>
                     
-                    {{-- Pesan --}}
+                    {{-- Pesan Instruksi --}}
                     <p class="text-xs text-center text-gray-500 mt-3" id="pesanKursi">
                         Pilih minimal 1 kursi
                     </p>
@@ -243,44 +282,55 @@
     </div>
 </div>
 
-{{-- Script --}}
+{{-- ============================================
+     JAVASCRIPT: INTERAKSI PEMILIHAN KURSI
+     ============================================ 
+--}}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const hargaTiket = parseInt("{{ $jadwal->harga_dasar ?? 0 }}") || 0;
+    // KONSTANTA
+    const hargaTiket = parseInt("{{ $hargaFinal }}") || 0;
     const kursiDivs = document.querySelectorAll(".kursi");
 
+    // EVENT LISTENER: KLIK KURSI
     kursiDivs.forEach(div => {
         div.addEventListener("click", function() {
-            // Abaikan kursi yang terjual atau pending
-            if (this.classList.contains("bg-red-600/80") || this.classList.contains("bg-yellow-500/80")) {
+            // ABAIKAN kursi yang terjual atau pending
+            if (this.classList.contains("bg-red-600/80") || 
+                this.classList.contains("bg-yellow-500/80")) {
                 return;
             }
 
+            // Toggle checkbox
             const kursiId = this.getAttribute("data-id");
             const checkbox = document.getElementById("kursi-" + kursiId);
             if (!checkbox) return;
 
             checkbox.checked = !checkbox.checked;
 
-            // Toggle warna kursi
+            // TOGGLE WARNA KURSI (Biru ↔ Hijau)
             if (checkbox.checked) {
+                // Kursi dipilih → Hijau
                 this.classList.remove("bg-blue-600", "hover:bg-blue-500", "hover:shadow-blue-500/50");
                 this.classList.add("bg-green-500", "scale-110", "shadow-xl", "shadow-green-500/50");
             } else {
+                // Kursi dibatalkan → Biru
                 this.classList.remove("bg-green-500", "scale-110", "shadow-xl", "shadow-green-500/50");
                 this.classList.add("bg-blue-600", "hover:bg-blue-500", "hover:shadow-blue-500/50");
             }
 
+            // Update summary card
             updateTotal();
         });
     });
 
+    // FUNGSI: UPDATE TOTAL & SUMMARY
     function updateTotal() {
         const checkboxes = document.querySelectorAll(".kursi-checkbox:checked");
         const selected = checkboxes.length;
         const total = selected * hargaTiket;
         
-        // Ambil nomor kursi yang dipilih (BARIS + KOLOM = nomor_kursi)
+        // Ambil nomor kursi yang dipilih (contoh: A1, B5, C10)
         const kursiTerpilih = Array.from(checkboxes).map(cb => {
             const kursiDiv = document.querySelector(`[data-id="${cb.value}"]`);
             return kursiDiv ? kursiDiv.getAttribute('data-nomor') : '';
@@ -288,10 +338,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const kursiText = kursiTerpilih.length > 0 ? kursiTerpilih.join(', ') : '-';
         
+        // Update UI
         document.getElementById("kursiDipilih").innerText = kursiText;
         document.getElementById("jumlahTiket").innerText = selected;
         document.getElementById("totalHarga").innerText = total.toLocaleString("id-ID");
 
+        // Enable/Disable tombol checkout
         const btnCheckout = document.getElementById("btnCheckout");
         const pesanKursi = document.getElementById("pesanKursi");
         
@@ -304,6 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // INIT: Jalankan sekali saat load
     updateTotal();
 });
 </script>

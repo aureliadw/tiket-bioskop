@@ -51,31 +51,37 @@
         </div>
 
         {{-- Navigation --}}
-        <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-            <a href="{{ route('kasir.dashboard') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.dashboard') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
+<nav class="flex-1 px-4 py-6 space-y-2 text-sm">
+    <a href="{{ route('kasir.dashboard') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.dashboard') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
 
-            <a href="{{ route('kasir.checkin') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.checkin') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-qrcode"></i> Check-In Tiket
-            </a>
+    {{-- ✅ TAMBAH: Menu Verifikasi Pembayaran --}}
+    <a href="{{ route('kasir.verifikasi') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.verifikasi') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-money-check-dollar"></i> Verifikasi Pembayaran
+    </a>
 
-            <a href="{{ route('kasir.jual-tiket') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.jual-tiket') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
-                <i class="fa-solid fa-ticket"></i> Jual Tiket Offline
-            </a>
+    <a href="{{ route('kasir.checkin') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.checkin') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-qrcode"></i> Check-In Tiket
+    </a>
 
-            <div class="border-t border-neutral-800 my-4"></div>
+    <a href="{{ route('kasir.jual-tiket') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.jual-tiket') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
+        <i class="fa-solid fa-ticket"></i> Jual Tiket Offline
+    </a>
 
-            @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.dashboard') }}" 
-               class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item text-gray-300 hover:text-white">
-                <i class="fa-solid fa-gear"></i> Admin Panel
-            </a>
-            @endif
-        </nav>
+    <div class="border-t border-neutral-800 my-4"></div>
+
+    @if(auth()->user()->role === 'admin')
+    <a href="{{ route('admin.dashboard') }}" 
+       class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item text-gray-300 hover:text-white">
+        <i class="fa-solid fa-gear"></i> Admin Panel
+    </a>
+    @endif
+</nav>
 
         {{-- Logout --}}
         <div class="border-t border-neutral-800 px-4 py-4">

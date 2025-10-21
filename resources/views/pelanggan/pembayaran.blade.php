@@ -60,9 +60,12 @@
     }"
     class="min-h-screen bg-neutral-950 text-white">
 
-    {{-- Header --}}
+    {{-- ============================================
+         HEADER: BACK BUTTON
+         ============================================ 
+    --}}
     <div class="bg-neutral-900 border-b border-neutral-800 py-4">
-        <div class="max-w-[1152px] mx-auto px-6">
+        <div class="max-w-6xl mx-auto px-4">
             <a href="{{ route('pelanggan.pilih-kursi', $pemesanan->jadwal_id) }}" 
                class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,13 +76,16 @@
         </div>
     </div>
 
-    <div class="max-w-[1152px] mx-auto px-6 py-8">
+    <div class="max-w-6xl mx-auto px-4 py-8">
         <form id="formPembayaran" @submit.prevent="submitPayment()">
             @csrf
             
             <div class="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6">
                 
-                {{-- KOLOM KIRI: DETAIL PESANAN --}}
+                {{-- ============================================
+                     KOLOM KIRI: DETAIL PESANAN
+                     ============================================ 
+                --}}
                 <div class="space-y-5">
                     
                     {{-- Alert Warning --}}
@@ -95,39 +101,41 @@
                         </div>
                     </div>
 
+                    {{-- Countdown Timer (jika belum bayar) --}}
                     @if($pemesanan->status_pembayaran === 'belum_bayar')
-    @php
-        $expiredAt = \Carbon\Carbon::parse($pemesanan->created_at)->addMinutes(10);
-    @endphp
-    
-    <div class="bg-red-900/20 border border-red-500 rounded-xl p-4 mb-6">
-        <p class="text-sm text-red-200 text-center">
-            ⏰ Selesaikan pembayaran dalam <strong id="countdown" class="text-red-400 text-lg"></strong>
-        </p>
-    </div>
+                        @php
+                            $expiredAt = \Carbon\Carbon::parse($pemesanan->created_at)->addMinutes(10);
+                        @endphp
+                        
+                        <div class="bg-red-900/20 border border-red-500 rounded-xl p-4">
+                            <p class="text-sm text-red-200 text-center">
+                                ⏰ Selesaikan pembayaran dalam <strong id="countdown" class="text-red-400 text-lg"></strong>
+                            </p>
+                        </div>
 
-    <script>
-        const expiredAt = new Date("{{ $expiredAt->toIso8601String() }}").getTime();
-        
-        const countdownInterval = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = expiredAt - now;
-            
-            if (distance < 0) {
-                clearInterval(countdownInterval);
-                document.getElementById('countdown').innerHTML = "EXPIRED!";
-                alert('Waktu pembayaran habis! Pemesanan akan dibatalkan.');
-                window.location.href = "{{ route('home') }}";
-                return;
-            }
-            
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            document.getElementById('countdown').innerHTML = minutes + "m " + seconds + "s";
-        }, 1000);
-    </script>
-@endif
+                        <script>
+                            const expiredAt = new Date("{{ $expiredAt->toIso8601String() }}").getTime();
+                            
+                            const countdownInterval = setInterval(() => {
+                                const now = new Date().getTime();
+                                const distance = expiredAt - now;
+                                
+                                if (distance < 0) {
+                                    clearInterval(countdownInterval);
+                                    document.getElementById('countdown').innerHTML = "EXPIRED!";
+                                    alert('Waktu pembayaran habis! Pemesanan akan dibatalkan.');
+                                    window.location.href = "{{ route('home') }}";
+                                    return;
+                                }
+                                
+                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                
+                                document.getElementById('countdown').innerHTML = minutes + "m " + seconds + "s";
+                            }, 1000);
+                        </script>
+                    @endif
+
                     {{-- Detail Pesanan Card --}}
                     <div class="bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 rounded-2xl border border-neutral-800 shadow-xl overflow-hidden">
                         <div class="bg-gradient-to-r from-red-600/10 to-pink-600/10 border-b border-neutral-800 px-6 py-4">
@@ -167,8 +175,8 @@
                                 
                                 <div class="text-gray-500">Total Tiket</div>
                                 <div class="font-bold text-lg">
-                                    {{ $kursis->count() }} Tiket × Rp {{ number_format($pemesanan->jadwal->harga_dasar, 0, ',', '.') }} = 
-                                    <span class="text-red-500">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                    {{ $kursis->count() }} Tiket × Rp {{ number_format($subtotal / $kursis->count(), 0, ',', '.') }} = 
+                                    <span class="text-red-500">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -188,32 +196,41 @@
                         <div class="p-6 space-y-5">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-400 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama_lengkap" value="{{ $user->nama_lengkap }}"
-                                    class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
-                                    placeholder="Masukkan nama lengkap"
-                                    required>
+                                <input type="text" 
+                                       name="nama_lengkap" 
+                                       value="{{ $user->nama_lengkap }}"
+                                       class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
+                                       placeholder="Masukkan nama lengkap"
+                                       required>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-400 mb-2">Email <span class="text-red-500">*</span></label>
-                                <input type="email" name="email" value="{{ $user->email }}"
-                                    class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
-                                    placeholder="email@example.com"
-                                    required>
+                                <input type="email" 
+                                       name="email" 
+                                       value="{{ $user->email }}"
+                                       class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
+                                       placeholder="email@example.com"
+                                       required>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-400 mb-2">Nomor HP <span class="text-red-500">*</span></label>
-                                <input type="text" name="phone" value="{{ $user->phone ?? '' }}"
-                                    class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
-                                    placeholder="08xxxxxxxxxx"
-                                    required>
+                                <input type="text" 
+                                       name="phone" 
+                                       value="{{ $user->phone ?? '' }}"
+                                       class="w-full px-4 py-3 rounded-xl bg-neutral-800 border-2 border-neutral-700 focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition placeholder-gray-500" 
+                                       placeholder="08xxxxxxxxxx"
+                                       required>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- KOLOM KANAN: DETAIL TRANSAKSI --}}
+                {{-- ============================================
+                     KOLOM KANAN: DETAIL TRANSAKSI (STICKY)
+                     ============================================ 
+                --}}
                 <div class="lg:sticky lg:top-6 h-fit">
                     <div class="bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-950 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden">
                         <div class="bg-gradient-to-r from-purple-600/10 to-pink-600/10 border-b border-neutral-800 px-6 py-4">
@@ -230,7 +247,7 @@
                             <div class="space-y-3">
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-400">Harga Tiket</span>
-                                    <span class="font-semibold">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                    <span class="font-semibold">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                                 </div>
                                 
                                 <div class="flex justify-between text-sm">
@@ -240,7 +257,7 @@
                                 
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-400">Diskon/Promo</span>
-                                    <span class="font-semibold text-green-400">- Rp 0</span>
+                                    <span class="font-semibold text-green-400">- Rp {{ number_format($diskon, 0, ',', '.') }}</span>
                                 </div>
                                 
                                 <div class="pt-3 mt-3 border-t border-neutral-700">
@@ -253,8 +270,9 @@
                                 </div>
                             </div>
 
-                            {{-- Voucher/Promo --}}
-                            <button type="button" class="w-full px-4 py-3 bg-gradient-to-r from-neutral-800 to-neutral-900 hover:from-neutral-700 hover:to-neutral-800 border-2 border-dashed border-neutral-700 hover:border-red-500/50 rounded-xl flex items-center justify-between transition-all group">
+                            {{-- Voucher/Promo Button --}}
+                            <button type="button" 
+                                    class="w-full px-4 py-3 bg-gradient-to-r from-neutral-800 to-neutral-900 hover:from-neutral-700 hover:to-neutral-800 border-2 border-dashed border-neutral-700 hover:border-red-500/50 rounded-xl flex items-center justify-between transition-all group">
                                 <div class="flex items-center gap-3">
                                     <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
@@ -279,11 +297,13 @@
                                         ['id'=>'mandiri','label'=>'Transfer Mandiri','icon'=>'/images/bankBCA.png'],
                                     ] as $m)
                                     <label class="cursor-pointer block group">
-                                        <input type="radio" name="metode_pembayaran" value="{{ $m['id'] }}" 
-                                            data-rekening="081234567890" 
-                                            data-label="{{ $m['label'] }}"
-                                            class="hidden peer" 
-                                            required>
+                                        <input type="radio" 
+                                               name="metode_pembayaran" 
+                                               value="{{ $m['id'] }}" 
+                                               data-rekening="081234567890" 
+                                               data-label="{{ $m['label'] }}"
+                                               class="hidden peer" 
+                                               required>
                                         <div class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-neutral-700 bg-neutral-800/30 group-hover:bg-neutral-800 peer-checked:border-red-500 peer-checked:bg-gradient-to-r peer-checked:from-red-900/20 peer-checked:to-pink-900/20 transition-all">
                                             <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-1">
                                                 <img src="{{ asset($m['icon']) }}" class="w-full h-full object-contain">
@@ -299,7 +319,8 @@
                             </div>
 
                             {{-- Button Bayar --}}
-                            <button type="submit" class="w-full py-4 bg-gradient-to-r from-red-600 via-red-600 to-pink-600 hover:from-red-700 hover:via-red-700 hover:to-pink-700 rounded-xl font-bold text-lg shadow-lg shadow-red-600/40 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-red-600/60">
+                            <button type="submit" 
+                                    class="w-full py-4 bg-gradient-to-r from-red-600 via-red-600 to-pink-600 hover:from-red-700 hover:via-red-700 hover:to-pink-700 rounded-xl font-bold text-lg shadow-lg shadow-red-600/40 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-red-600/60">
                                 <span class="flex items-center justify-center gap-2">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -314,15 +335,25 @@
         </form>
     </div>
 
-    {{-- Modal (SAMA SEPERTI SEBELUMNYA) --}}
-    <div x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50 p-4" x-transition>
-        <div class="bg-neutral-900 w-full max-w-lg rounded-2xl p-6 relative text-white max-h-[90vh] overflow-y-auto border border-neutral-800" @click.away="showModal=false">
-            <button @click="showModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+    {{-- ============================================
+         MODAL: INSTRUKSI PEMBAYARAN
+         ============================================ 
+    --}}
+    <div x-show="showModal" 
+         class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50 p-4" 
+         x-transition>
+        <div class="bg-neutral-900 w-full max-w-lg rounded-2xl p-6 relative text-white max-h-[90vh] overflow-y-auto border border-neutral-800" 
+             @click.away="showModal=false">
+            
+            {{-- Close Button --}}
+            <button @click="showModal=false" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
 
+            {{-- INSTRUKSI PEMBAYARAN --}}
             <div x-show="!showUploadForm">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold mb-2">Instruksi Pembayaran</h2>
@@ -330,6 +361,7 @@
                     <p class="text-4xl font-mono font-bold text-red-400 mt-3" x-text="formatTime(countdown)"></p>
                 </div>
 
+                {{-- E-WALLET (DANA, GOPAY, OVO) --}}
                 <template x-if="['dana', 'gopay', 'ovo'].includes(selectedPayment)">
                     <div>
                         <div class="bg-neutral-800 rounded-xl p-4 mb-4 text-center">
@@ -339,7 +371,8 @@
                             <div class="flex justify-center mb-4">
                                 <div class="p-4 bg-white rounded-xl">
                                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PAYMENT-{{ $pemesanan->id }}-{{ $total }}" 
-                                         alt="QR Code" class="w-48 h-48">
+                                         alt="QR Code" 
+                                         class="w-48 h-48">
                                 </div>
                             </div>
 
@@ -353,6 +386,7 @@
                     </div>
                 </template>
 
+                {{-- TRANSFER BANK (BCA, MANDIRI) --}}
                 <template x-if="['bca', 'mandiri'].includes(selectedPayment)">
                     <div>
                         <div class="bg-neutral-800 rounded-xl p-4 mb-4">
@@ -367,8 +401,11 @@
                                     <span class="text-gray-400 text-sm">Virtual Account:</span>
                                     <div class="flex items-center gap-2">
                                         <span class="font-mono font-bold text-xl text-green-400" x-text="'8808' + '{{ str_pad($pemesanan->id, 6, '0', STR_PAD_LEFT) }}'"></span>
-                                        <button type="button" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)" 
-                                                class="text-xs bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded">Copy</button>
+                                        <button type="button" 
+                                                onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)" 
+                                                class="text-xs bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded">
+                                            Copy
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-between">
@@ -380,36 +417,56 @@
                     </div>
                 </template>
 
+                {{-- Action Buttons --}}
                 <div class="space-y-3">
-                    <button @click="showUploadForm = true" class="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition">
+                    <button @click="showUploadForm = true" 
+                            class="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition">
                         Saya Sudah Transfer
                     </button>
-                    <button @click="showModal = false" class="w-full py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-semibold transition">
+                    <button @click="showModal = false" 
+                            class="w-full py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-semibold transition">
                         Transfer Nanti
                     </button>
                 </div>
             </div>
 
+            {{-- FORM UPLOAD BUKTI TRANSFER --}}
             <div x-show="showUploadForm">
                 <h2 class="text-2xl font-bold mb-4 text-center">Upload Bukti Transfer</h2>
                 
-                <form action="{{ route('pelanggan.upload-bukti', $pemesanan->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <form action="{{ route('pelanggan.upload-bukti', $pemesanan->id) }}" 
+                      method="POST" 
+                      enctype="multipart/form-data" 
+                      class="space-y-4">
                     @csrf
                     
                     <div>
                         <label class="block text-sm mb-2">Bukti Transfer</label>
-                        <input type="file" name="bukti_transfer" accept="image/*" required
-                            class="w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-600 file:text-white file:font-semibold hover:file:bg-green-500">
+                        <input type="file" 
+                               name="bukti_transfer" 
+                               accept="image/*" 
+                               required
+                               class="w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-600 file:text-white file:font-semibold hover:file:bg-green-500">
                     </div>
 
                     <div>
                         <label class="block text-sm mb-2">Catatan (Opsional)</label>
-                        <textarea name="catatan" rows="3" class="w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700" placeholder="Catatan pembayaran..."></textarea>
+                        <textarea name="catatan" 
+                                  rows="3" 
+                                  class="w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700" 
+                                  placeholder="Catatan pembayaran..."></textarea>
                     </div>
 
                     <div class="space-y-3">
-                        <button type="submit" class="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold">Upload & Selesai</button>
-                        <button type="button" @click="showUploadForm = false" class="w-full py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg">Kembali</button>
+                        <button type="submit" 
+                                class="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold">
+                            Upload & Selesai
+                        </button>
+                        <button type="button" 
+                                @click="showUploadForm = false" 
+                                class="w-full py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg">
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

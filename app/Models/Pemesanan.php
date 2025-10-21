@@ -82,8 +82,13 @@ class Pemesanan extends Model
         return $this->hasOne(Pembayaran::class, 'pemesanan_id');
     }
 
-    public function usedBy()
+        public function usedBy()
     {
-        return $this->belongsTo(User::class, 'used_by');
+        return $this->belongsTo(User::class, 'diproses_oleh');
+    }
+
+    public function diproses()
+    {
+        return $this->belongsTo(User::class, 'diproses_oleh');
     }
 }

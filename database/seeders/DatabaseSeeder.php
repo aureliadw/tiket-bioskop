@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\Owner\OwnerController;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

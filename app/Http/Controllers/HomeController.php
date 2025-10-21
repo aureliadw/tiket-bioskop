@@ -15,3 +15,5 @@ class HomeController extends Controller
         return view('pelanggan.home', compact('nowPlaying', 'comingSoon'));
     }
 }
+
+
