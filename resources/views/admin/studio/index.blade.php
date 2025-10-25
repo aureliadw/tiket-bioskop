@@ -73,14 +73,10 @@
                     @endif
 
                     {{-- Stats --}}
-                    <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
                         <div class="bg-neutral-800/50 rounded-lg p-3 text-center">
                             <p class="text-2xl font-bold text-blue-400">{{ $studio->total_kursi }}</p>
                             <p class="text-xs text-gray-500">Kursi</p>
-                        </div>
-                        <div class="bg-neutral-800/50 rounded-lg p-3 text-center">
-                            <p class="text-2xl font-bold text-purple-400">{{ $studio->kursis_count ?? 0 }}</p>
-                            <p class="text-xs text-gray-500">Layout</p>
                         </div>
                         <div class="bg-neutral-800/50 rounded-lg p-3 text-center">
                             <p class="text-2xl font-bold text-green-400">{{ $studio->jadwals_count ?? 0 }}</p>

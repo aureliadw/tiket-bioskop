@@ -25,7 +25,7 @@
             <path d="M12 2l2.39 7.26h7.63l-6.18 4.49 2.36 7.25L12 16.77l-6.2 4.23 2.36-7.25L2 9.26h7.61z"/>
           </svg>
           <span class="text-red-600">PPY</span>
-          <span class="text-red-600">CINE</span>
+          <span class="text-white-600">CINE</span>
         </h1>
         <p class="text-gray-400">Login to your account</p>
       </div>

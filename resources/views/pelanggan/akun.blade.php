@@ -307,7 +307,7 @@
                                                     </svg>
                                                     Pending Verification
                                                 </span>
-                                                <p class="text-xs text-gray-500">Menunggu konfirmasi admin</p>
+                                                <p class="text-xs text-gray-500">Menunggu konfirmasi</p>
 
                                             {{-- 5. BELUM BAYAR (Belum upload bukti) --}}
                                             @else
@@ -317,13 +317,7 @@
                                                     </svg>
                                                     Pending
                                                 </span>
-                                                <a href="{{ route('pembayaran.show', $pemesanan->id) }}"
-                                                   class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-white text-xs font-bold transition-colors">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                                    </svg>
-                                                    Lanjutkan Pembayaran
-                                                </a>
+                                                
                                             @endif
                                         </div>
                                     </div>

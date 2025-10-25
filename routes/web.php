@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\KelolaOwnerController;
 use App\Http\Controllers\Kasir\KasirController;
 use App\Http\Controllers\Owner\OwnerController;
 use App\Http\Controllers\TiketController;
+use App\Http\Controllers\Admin\LaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +57,17 @@ Route::middleware('auth')->group(function () {
     // 🔹 Pilih Kursi
     Route::get('/jadwal/{id}/kursi', [BookingController::class, 'pilihKursi'])->name('pelanggan.pilih-kursi');
     Route::post('/jadwal/{id}/kursi', [BookingController::class, 'prosesKursi'])->name('pelanggan.proses-kursi');
+    
+    // ✅ Generate Snap Token
+    Route::post('/booking/payment/{pemesanan}', [BookingController::class, 'generateSnapToken'])->name('booking.generate-snap');
+    
+    // ✅ Check Payment Status
+    Route::get('/booking/check-status/{orderId}', [BookingController::class, 'checkPaymentStatus'])->name('booking.check-status');
+
+    Route::post('/midtrans/callback', [BookingController::class, 'handleCallback']);
+
+    /* 🔥 MIDTRANS: Check Payment Status
+    Route::get('/pembayaran/check-status/{orderId}', [PembayaranController::class, 'checkPaymentStatus'])->name('pembayaran.check-status');
 
     // pembayaran - route lama (tetap ada)
     Route::get('/pembayaran/{pemesanan_id}', [PembayaranController::class, 'show'])->name('pembayaran.show');
@@ -63,7 +75,7 @@ Route::middleware('auth')->group(function () {
 
     // route baru untuk alur pembayaran yang diperbaiki
     Route::post('/pembayaran/proses/{pemesanan}', [PembayaranController::class, 'prosesPembayaran'])->name('pelanggan.proses-pembayaran');
-    Route::post('/pembayaran/upload-bukti/{pemesanan}', [PembayaranController::class, 'uploadBukti'])->name('pelanggan.upload-bukti');
+    Route::post('/pembayaran/upload-bukti/{pemesanan}', [PembayaranController::class, 'uploadBukti'])->name('pelanggan.upload-bukti');*/
 
     // Profile & Riwayat
     Route::get('/akun', [ProfileController::class, 'index'])->name('profile.index');
@@ -71,7 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/akun/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
     Route::delete('/profile/delete', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/tiket/{pemesanan_id}', [PembayaranController::class, 'showTiket'])->name('pelanggan.tiket');
+    Route::get('/tiket/{pemesanan_id}', [BookingController::class, 'showTiket'])->name('pelanggan.tiket');
 
     Route::get('/tiket/verify/{code}', [TiketController::class, 'verify'])->name('tiket.verify');
 });
@@ -105,28 +117,56 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('pelanggan', KelolaPelangganController::class);
     Route::resource('kasir', KelolaKasirController::class);
     Route::resource('owner', KelolaOwnerController::class);
+
+    Route::prefix('laporan')->name('laporan.')->group(function () {
+        Route::get('/', [LaporanController::class, 'index'])->name('index');
+        
+        // Laporan Transaksi
+        Route::get('/transaksi', [LaporanController::class, 'transaksi'])->name('transaksi');
+        Route::get('/transaksi/pdf', [LaporanController::class, 'transaksiPdf'])->name('transaksi.pdf');
+        
+        // Laporan Pendapatan
+        Route::get('/pendapatan', [LaporanController::class, 'pendapatan'])->name('pendapatan');
+        Route::get('/pendapatan/pdf', [LaporanController::class, 'pendapatanPdf'])->name('pendapatan.pdf');
+        
+        // Laporan Film
+        Route::get('/film', [LaporanController::class, 'film'])->name('film');
+        Route::get('/film/pdf', [LaporanController::class, 'filmPdf'])->name('film.pdf');
+    });
 });
 
-Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->group(function () {
-    Route::get('/dashboard', [KasirController::class, 'dashboard'])->name('kasir.dashboard');
+// ========== KASIR ROUTES ==========
+Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->name('kasir.')->group(function () {
     
-    Route::get('/verifikasi-pembayaran', [KasirController::class, 'verifikasiPembayaran'])->name('kasir.verifikasi');
-    Route::post('/pembayaran/{id}/konfirmasi', [KasirController::class, 'konfirmasiPembayaran'])->name('kasir.pembayaran.konfirmasi');
-    Route::post('/pembayaran/{id}/tolak', [KasirController::class, 'tolakPembayaran'])->name('kasir.pembayaran.tolak');
-
-    // Check-In
-    Route::get('/check-in', [KasirController::class, 'checkInPage'])->name('kasir.checkin');
-    Route::post('/check-in/code', [KasirController::class, 'checkByCode'])->name('kasir.checkin.code');
-    Route::post('/check-in/scan', [KasirController::class, 'scanTiket'])->name('kasir.checkin.scan');
-    Route::post('/check-in/use/{id}', [KasirController::class, 'useTiket'])->name('kasir.checkin.use');
+    // Dashboard
+    Route::get('/dashboard', [KasirController::class, 'dashboard'])->name('dashboard');
     
-    // Jual Tiket Offline
-    Route::get('/jual-tiket', [KasirController::class, 'jualTiketPage'])->name('kasir.jual-tiket');
-    Route::get('/get-kursi/{jadwalId}', [KasirController::class, 'getKursiTersedia'])->name('kasir.get-kursi');
-    Route::post('/store-tiket-offline', [KasirController::class, 'storeTiketOffline'])->name('kasir.store-tiket-offline');
+    // Check-in Tiket
+    Route::get('/checkin', [KasirController::class, 'checkInPage'])->name('checkin');
+    Route::post('/check-by-code', [KasirController::class, 'checkByCode'])->name('check-by-code');
+    Route::post('/scan-tiket', [KasirController::class, 'scanTiket'])->name('scan-tiket');
+    Route::post('/use-tiket/{id}', [KasirController::class, 'useTiket'])->name('use-tiket');
     
     // Print Tiket
-    Route::get('/print/{id}', [KasirController::class, 'printTiket'])->name('kasir.print.tiket');
+    Route::get('/print/{id}', [KasirController::class, 'printTiket'])->name('print.tiket');
+    
+    // Jual Tiket Offline
+    Route::get('/jual-tiket', [KasirController::class, 'jualTiketPage'])->name('jual-tiket');
+    Route::get('/get-kursi/{jadwalId}', [KasirController::class, 'getKursiTersedia'])->name('get-kursi');
+    
+    // Store Tiket Offline (CASH)
+    Route::post('/store-tiket-offline', [KasirController::class, 'storeTiketOffline'])->name('store-tiket-offline');
+    
+    // Generate Snap Token (DIGITAL)
+    Route::post('/generate-snap-token-offline', [KasirController::class, 'generateSnapTokenOffline'])->name('generate-snap-token-offline');
+    
+    // Check Payment Status (DIGITAL)
+    Route::get('/check-payment-status-offline/{orderId}', [KasirController::class, 'checkPaymentStatusOffline'])->name('check-payment-status-offline');
+    
+    // Verifikasi Pembayaran
+    Route::get('/verifikasi-pembayaran', [KasirController::class, 'verifikasiPembayaran'])->name('verifikasi-pembayaran');
+    Route::post('/konfirmasi-pembayaran/{id}', [KasirController::class, 'konfirmasiPembayaran'])->name('konfirmasi-pembayaran');
+    Route::post('/tolak-pembayaran/{id}', [KasirController::class, 'tolakPembayaran'])->name('tolak-pembayaran');
 });
 
 // Owner
@@ -136,3 +176,6 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->group(function () {
     Route::get('/film-performance', [OwnerController::class, 'filmPerformance'])->name('owner.film.performance');
     Route::get('/export-pdf', [OwnerController::class, 'exportPDF'])->name('owner.export.pdf');
 });
+
+Route::post('/midtrans/webhook', [BookingController::class, 'midtransWebhook'])->name('midtrans.webhook');
+

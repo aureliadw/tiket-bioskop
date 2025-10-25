@@ -58,10 +58,10 @@
     </a>
 
     {{-- ✅ TAMBAH: Menu Verifikasi Pembayaran --}}
-    <a href="{{ route('kasir.verifikasi') }}" 
+    {{-- <a href="{{ route('kasir.verifikasi') }}" 
        class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.verifikasi') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">
         <i class="fa-solid fa-money-check-dollar"></i> Verifikasi Pembayaran
-    </a>
+    </a> --}}
 
     <a href="{{ route('kasir.checkin') }}" 
        class="flex items-center gap-3 px-4 py-2 rounded-lg nav-item {{ request()->routeIs('kasir.checkin') ? 'active-link text-red-400' : 'text-gray-300 hover:text-white' }}">

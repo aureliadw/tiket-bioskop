@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>HappyCine - @yield('title', 'Home')</title>
 
   {{-- Tailwind CDN --}}
@@ -32,46 +33,27 @@
     .nav-link { @apply text-gray-300 hover:text-red-500 transition; }
     .nav-link.active { @apply text-red-500 font-semibold; }
     
-    /* ✅ LOGO STYLE - CINEMA PREMIUM */
-    .logo-cinema {
+    /* ✅ NEW LOGO STYLE WITH STAR */
+    .logo-text {
       font-family: 'Righteous', cursive;
-      font-size: 1.75rem;
-      font-weight: 400;
-      letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #fff 0%, #e5e5e5 50%, #fff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.5));
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
       transition: all 0.3s ease;
     }
     
-    .logo-cinema:hover {
-      filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8));
-      letter-spacing: 0.08em;
+    .logo-text:hover {
+      letter-spacing: 0.05em;
+      filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
     }
     
-    .logo-accent {
-      font-family: 'Righteous', cursive;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .star-icon {
+      animation: starPulse 2s ease-in-out infinite;
     }
     
-    .film-strip {
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        transparent 20%, 
-        rgba(239, 68, 68, 0.3) 20%, 
-        rgba(239, 68, 68, 0.3) 40%, 
-        transparent 40%, 
-        transparent 60%, 
-        rgba(239, 68, 68, 0.3) 60%, 
-        rgba(239, 68, 68, 0.3) 80%, 
-        transparent 80%);
-      height: 2px;
-      width: 100%;
+    @keyframes starPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
     }
   </style>
 </head>
@@ -81,36 +63,18 @@
   <header class="bg-black/40 backdrop-blur-md fixed top-0 left-0 right-0 z-40 border-b border-white/10">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
-      {{-- ✅ LOGO PREMIUM CINEMA STYLE --}}
-      <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-        {{-- Film Reel Icon --}}
-        <div class="relative">
-          <!-- Rotating outer ring -->
-          <div class="absolute inset-0 rounded-full border-2 border-red-500/30 group-hover:border-red-500/60 transition-all group-hover:rotate-180 duration-700"></div>
-          
-          <!-- Center circle with film symbol -->
-          <div class="relative w-10 h-10 bg-gradient-to-br from-red-600 via-red-700 to-red-900 rounded-full flex items-center justify-center shadow-lg shadow-red-500/50 group-hover:shadow-red-500/80 transition-all">
-            <!-- Film holes -->
-            <div class="absolute top-1 left-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
-            <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
-            <div class="absolute bottom-1 left-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
-            <div class="absolute bottom-1 right-1 w-1.5 h-1.5 bg-black/30 rounded-full"></div>
-            
-            <!-- Play button -->
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        </div>
-        
-        {{-- Logo Text --}}
-        <div class="flex flex-col -space-y-1">
-          <div class="flex items-center gap-0">
-            <span class="logo-cinema">HAPPY</span>
-            <span class="logo-cinema logo-accent">CINE</span>
-          </div>
-          <div class="film-strip"></div>
-        </div>
+      {{-- ✅ NEW LOGO WITH STAR --}}
+      <a href="{{ route('home') }}" class="flex items-center gap-1 group">
+        <h1 class="logo-text flex items-center justify-center gap-1">
+          <span class="text-red-600">H</span>
+          <svg xmlns="http://www.w3.org/2000/svg" 
+               class="w-6 h-6 text-white star-icon inline-block" 
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l2.39 7.26h7.63l-6.18 4.49 2.36 7.25L12 16.77l-6.2 4.23 2.36-7.25L2 9.26h7.61z"/>
+          </svg>
+          <span class="text-red-600">PPY</span>
+          <span class="text-white">CINE</span>
+        </h1>
       </a>
 
       {{-- Menu --}}

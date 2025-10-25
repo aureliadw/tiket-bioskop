@@ -1,4 +1,4 @@
-@include('layouts.app')
+@include ('layouts.app')
 
 {{-- HERO SLIDER --}}
 <section 
@@ -57,7 +57,7 @@
       {{-- Title --}}
       <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight">
         <span 
-          class="block bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent drop-shadow-2xl" 
+          class="block bg-gradient-to-r from-white vi a-gray-100 to-gray-300 bg-clip-text text-transparent drop-shadow-2xl" 
           x-text="slides[active].title">
         </span>
       </h1>

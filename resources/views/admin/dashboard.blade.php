@@ -31,7 +31,7 @@
         </div>
 
         {{-- Stats Grid dengan Animasi --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
             {{-- Total Pemesanan --}}
             <div class="group relative bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer">
@@ -54,35 +54,6 @@
                 </div>
             </div>
 
-            {{-- Pending Verifikasi --}}
-            <div class="group relative bg-gradient-to-br from-yellow-600 to-orange-700 rounded-2xl p-6 overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer">
-                <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                
-                <div class="relative z-10">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        @if($stats['pending_pembayaran'] > 0)
-                            <span class="relative flex h-3 w-3">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-                            </span>
-                        @endif
-                    </div>
-                    <p class="text-yellow-100 text-sm mb-1">Pending Verifikasi</p>
-                    <h3 class="text-3xl font-black">{{ $stats['pending_pembayaran'] }}</h3>
-                    <a href="{{ route('admin.pembayaran') }}" class="text-xs text-white/80 hover:text-white transition mt-2 inline-flex items-center gap-1 group">
-                        Verifikasi Sekarang
-                        <svg class="w-3 h-3 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
             {{-- Total Revenue --}}
             <div class="group relative bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl p-6 overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer">
                 <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -101,18 +72,18 @@
                 </div>
             </div>
 
-            {{-- Quick Action --}}
+            {{-- Quick Action - Kelola Film --}}
             <div class="group relative bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 overflow-hidden hover:scale-105 transition-all duration-300">
                 <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 
-                <a href="{{ route('admin.pembayaran') }}" class="relative z-10 flex flex-col items-center justify-center h-full text-center">
+                <a href="{{ route('admin.film.index') }}" class="relative z-10 flex flex-col items-center justify-center h-full text-center">
                     <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-3">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
                         </svg>
                     </div>
-                    <p class="font-bold text-lg mb-1">Verifikasi</p>
-                    <p class="text-sm text-red-100">{{ $stats['pending_pembayaran'] }} menunggu</p>
+                    <p class="font-bold text-lg mb-1">Kelola Film</p>
+                    <p class="text-sm text-red-100">{{ $stats['total_film'] }} film tersedia</p>
                 </a>
             </div>
 
@@ -148,7 +119,21 @@
                 </div>
             </div>
 
-            <div class="bg-neutral-900 rounded-xl p-4 border border-neutral-800 hover:border-neutral-700 transition col-span-2">
+            <div class="bg-neutral-900 rounded-xl p-4 border border-neutral-800 hover:border-neutral-700 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-yellow-400">{{ $stats['pending_pembayaran'] }}</p>
+                        <p class="text-xs text-gray-500">Pending Payment</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-neutral-900 rounded-xl p-4 border border-neutral-800 hover:border-neutral-700 transition">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
@@ -158,10 +143,9 @@
                         </div>
                         <div>
                             <p class="text-lg font-bold text-green-400">+12.5%</p>
-                            <p class="text-xs text-gray-500">Growth this month</p>
+                            <p class="text-xs text-gray-500">Growth</p>
                         </div>
                     </div>
-                    <span class="text-xs text-gray-500">vs last month</span>
                 </div>
             </div>
         </div>
@@ -261,8 +245,6 @@
             </div>
         </div>
 
-    </div>
-</div>
     </div>
 </div>
 @endsection
