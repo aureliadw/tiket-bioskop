@@ -10,7 +10,7 @@
             <div class="flex gap-3">
                 <a href="{{ route('admin.jadwal.bulk.create') }}" 
                    class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2 rounded-lg font-semibold transition shadow-lg shadow-red-600/30">
-                    <i class="fas fa-magic mr-2"></i>Bulk Input
+                    <i class="fas fa-magic mr-2"></i>Tambah Jadwal
                 </a>
             </div>
         </div>

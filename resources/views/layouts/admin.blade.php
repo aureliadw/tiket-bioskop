@@ -6,6 +6,7 @@
     <title>Admin | HappyCine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/a2d04b5e2c.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +17,8 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
+        [x-cloak] { display: none !important; }
 
         /* Animasi dan efek glow halus */
         .nav-item {
@@ -32,7 +35,7 @@
             color: #f87171 !important;
         }
 
-        /* ✅ LOGO STYLE WITH STAR */
+        /* Logo Style */
         .logo-text {
             font-family: 'Righteous', cursive;
             font-size: 1.4rem;
@@ -80,12 +83,14 @@
         }
     </style>
 </head>
-<body class="bg-neutral-950 text-white flex min-h-screen">
+<body class="bg-neutral-950 text-white" x-data="{ sidebarOpen: false }">
 
     {{-- Sidebar --}}
-    <aside class="w-72 bg-gradient-to-b from-neutral-900 to-neutral-950 border-r border-neutral-800 flex flex-col shadow-2xl">
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" 
+           class="fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-neutral-900 to-neutral-950 border-r border-neutral-800 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out">
+        
         {{-- Logo Header --}}
-        <div class="px-6 py-6 border-b border-neutral-800">
+        <div class="px-6 py-6 border-b border-neutral-800 flex items-center justify-between">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-1 group">
                 <h1 class="logo-text flex items-center justify-center gap-1">
                     <span class="text-red-600">H</span>
@@ -98,14 +103,21 @@
                     <span class="text-white">CINE</span>
                 </h1>
             </a>
-            <p class="text-xs text-gray-500 mt-2 ml-1 font-medium">Admin Panel</p>
+            
+            {{-- Close Button (Mobile Only) --}}
+            <button @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:text-white transition">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
         </div>
+
+        <p class="text-xs text-gray-500 px-6 mt-2 ml-1 font-medium">Admin Panel</p>
 
         {{-- Navigation Menu --}}
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm overflow-y-auto">
 
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}" 
+               @click="sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {{ request()->routeIs('admin.dashboard') ? 'active-link' : 'text-gray-300 hover:text-white' }}">
                 <i class="fa-solid fa-house w-5"></i>
                 <span class="font-medium">Dashboard</span>
@@ -118,6 +130,7 @@
 
             {{-- Kelola Film --}}
             <a href="{{ route('admin.film.index') }}" 
+               @click="sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {{ request()->routeIs('admin.film*') ? 'active-link' : 'text-gray-300 hover:text-white' }}">
                 <i class="fa-solid fa-film w-5"></i>
                 <span class="font-medium">Kelola Film</span>
@@ -125,6 +138,7 @@
 
             {{-- Kelola Jadwal --}}
             <a href="{{ route('admin.jadwal.index') }}" 
+               @click="sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {{ request()->routeIs('admin.jadwal*') ? 'active-link' : 'text-gray-300 hover:text-white' }}">
                 <i class="fa-solid fa-calendar-days w-5"></i>
                 <span class="font-medium">Kelola Jadwal</span>
@@ -132,6 +146,7 @@
 
             {{-- Kelola Studio --}}
             <a href="{{ route('admin.studio.index') }}" 
+               @click="sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {{ request()->routeIs('admin.studio*') ? 'active-link' : 'text-gray-300 hover:text-white' }}">
                 <i class="fa-solid fa-couch w-5"></i>
                 <span class="font-medium">Kelola Studio</span>
@@ -144,12 +159,13 @@
 
             {{-- Pemesanan --}}
             <a href="{{ route('admin.pemesanan') }}" 
+               @click="sidebarOpen = false"
                class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {{ request()->routeIs('admin.pemesanan') ? 'active-link' : 'text-gray-300 hover:text-white' }}">
                 <i class="fa-solid fa-ticket w-5"></i>
                 <span class="font-medium">Pemesanan</span>
             </a>
 
-            {{-- ✅ LAPORAN (NEW) --}}
+            {{-- Laporan --}}
             <div x-data="{ open: {{ request()->routeIs('admin.laporan*') ? 'true' : 'false' }} }" class="space-y-1">
                 <button @click="open = !open" 
                         class="w-full flex items-center justify-between px-4 py-3 rounded-xl nav-item text-gray-300 hover:text-white {{ request()->routeIs('admin.laporan*') ? 'active-link' : '' }}">
@@ -166,14 +182,17 @@
                      x-transition:enter-end="opacity-100 transform translate-y-0"
                      class="pl-12 space-y-1 mt-1">
                     <a href="{{ route('admin.laporan.transaksi') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.laporan.transaksi*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Laporan Transaksi</span>
                     </a>
                     <a href="{{ route('admin.laporan.pendapatan') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.laporan.pendapatan*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Laporan Pendapatan</span>
                     </a>
                     <a href="{{ route('admin.laporan.film') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.laporan.film*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Laporan Film</span>
                     </a>
@@ -185,7 +204,7 @@
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pengguna</p>
             </div>
 
-            {{-- Submenu: Data Pengguna --}}
+            {{-- Data Pengguna --}}
             <div x-data="{ open: {{ request()->routeIs('admin.pelanggan*', 'admin.kasir*', 'admin.owner*') ? 'true' : 'false' }} }" class="space-y-1">
                 <button @click="open = !open" 
                         class="w-full flex items-center justify-between px-4 py-3 rounded-xl nav-item text-gray-300 hover:text-white {{ request()->routeIs('admin.pelanggan*', 'admin.kasir*', 'admin.owner*') ? 'active-link' : '' }}">
@@ -202,14 +221,17 @@
                      x-transition:enter-end="opacity-100 transform translate-y-0"
                      class="pl-12 space-y-1 mt-1">
                     <a href="{{ route('admin.pelanggan.index') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.pelanggan*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Pelanggan</span>
                     </a>
                     <a href="{{ route('admin.kasir.index') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.kasir*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Kasir</span>
                     </a>
                     <a href="{{ route('admin.owner.index') }}" 
+                       @click="sidebarOpen = false"
                        class="block px-4 py-2.5 rounded-lg submenu-item {{ request()->routeIs('admin.owner*') ? 'text-red-400 bg-red-950/20' : 'text-gray-400 hover:text-white' }}">
                         <span class="font-medium text-sm">Owner</span>
                     </a>
@@ -217,38 +239,48 @@
             </div>
         </nav>
 
-        {{-- Sidebar Footer --}}
-        <div class="px-6 py-4 border-t border-neutral-800">
-            <div class="flex items-center gap-3 text-xs text-gray-500">
-                <i class="fa-solid fa-circle-info"></i>
-                <span>Version 1.0.0</span>
-            </div>
+        {{-- Logout Button di Sidebar --}}
+        <div class="border-t border-neutral-800 px-4 py-4">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button class="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 
     {{-- Main Content Area --}}
-    <main class="flex-1 overflow-y-auto bg-neutral-950">
+    <div class="lg:pl-72 flex-1 min-h-screen flex flex-col">
         {{-- Header --}}
-        <header class="bg-gradient-to-r from-neutral-900 to-neutral-950 border-b border-neutral-800 px-8 py-5 flex items-center justify-between sticky top-0 z-10 shadow-lg backdrop-blur-sm">
-            <div>
-                <h2 class="text-xl font-bold tracking-tight">
-                    @yield('page-title', 'Dashboard')
-                </h2>
-                <p class="text-xs text-gray-500 mt-0.5">
-                    @yield('page-subtitle', 'Manage your cinema system')
-                </p>
+        <header class="bg-gradient-to-r from-neutral-900 to-neutral-950 border-b border-neutral-800 px-4 lg:px-8 py-4 lg:py-5 flex items-center justify-between sticky top-0 z-10 shadow-lg backdrop-blur-sm">
+            <div class="flex items-center gap-3 lg:gap-4">
+                {{-- Hamburger Menu Button (Mobile) --}}
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+
+                <div>
+                    <h2 class="text-lg lg:text-xl font-bold tracking-tight">
+                        @yield('page-title', 'Dashboard')
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5 hidden sm:block">
+                        @yield('page-subtitle', 'Manage your cinema system')
+                    </p>
+                </div>
             </div>
             
-            <div class="flex items-center space-x-5">
-                {{-- Notifications Icon (Optional) --}}
-                <button class="relative text-gray-400 hover:text-white transition">
+            <div class="flex items-center space-x-3 lg:space-x-5">
+                {{-- Notifications Icon --}}
+                <button class="relative text-gray-400 hover:text-white transition hidden sm:block">
                     <i class="fa-solid fa-bell text-lg"></i>
                     <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full"></span>
                 </button>
 
                 {{-- Profile Section --}}
-                <div class="flex items-center space-x-3 pl-5 border-l border-neutral-800">
-                    <div class="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                <div class="flex items-center space-x-2 lg:space-x-3">
+                    <div class="w-9 h-9 lg:w-10 lg:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center font-bold text-xs lg:text-sm shadow-lg">
                         {{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}
                     </div>
                     <div class="hidden md:block">
@@ -256,26 +288,20 @@
                         <p class="text-xs text-gray-500">Administrator</p>
                     </div>
                 </div>
-
-                {{-- Logout Button --}}
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button 
-                        class="px-5 py-2.5 text-sm rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-red-600/30 hover:scale-105">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Keluar</span>
-                    </button>
-                </form>
             </div>
         </header>
 
         {{-- Page Content --}}
-        <section class="p-8">
+        <main class="flex-1 p-4 lg:p-8">
             @yield('content')
-        </section>
-    </main>
+        </main>
+    </div>
 
-    {{-- Alpine.js --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {{-- Mobile Sidebar Overlay --}}
+    <div x-show="sidebarOpen" 
+         @click="sidebarOpen = false"
+         x-cloak
+         class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"></div>
+
 </body>
 </html>

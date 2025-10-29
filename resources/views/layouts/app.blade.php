@@ -10,7 +10,6 @@
   {{-- Tailwind CDN --}}
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   {{-- Google Fonts - Premium Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +32,7 @@
     .nav-link { @apply text-gray-300 hover:text-red-500 transition; }
     .nav-link.active { @apply text-red-500 font-semibold; }
     
-    /* ✅ NEW LOGO STYLE WITH STAR */
+    /* Logo Style */
     .logo-text {
       font-family: 'Righteous', cursive;
       font-size: 1.5rem;
@@ -55,66 +54,151 @@
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.1); opacity: 0.8; }
     }
+
+    /* Mobile Menu Animation */
+    .mobile-menu {
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
   </style>
 </head>
 <body class="bg-[#0b0b0c] text-white font-sans">
 
   {{-- NAVBAR --}}
-  <header class="bg-black/40 backdrop-blur-md fixed top-0 left-0 right-0 z-40 border-b border-white/10">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+  <header class="bg-black/40 backdrop-blur-md fixed top-0 left-0 right-0 z-40 border-b border-white/10" x-data="{ mobileMenuOpen: false, searchOpen: false }">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      
+      {{-- Top Bar: Logo + Hamburger + Search Toggle --}}
+      <div class="flex items-center justify-between">
+        
+        {{-- Logo --}}
+        <a href="{{ route('home') }}" class="flex items-center gap-1 group">
+          <h1 class="logo-text flex items-center justify-center gap-1">
+            <span class="text-red-600">H</span>
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 class="w-6 h-6 text-white star-icon inline-block" 
+                 fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l2.39 7.26h7.63l-6.18 4.49 2.36 7.25L12 16.77l-6.2 4.23 2.36-7.25L2 9.26h7.61z"/>
+            </svg>
+            <span class="text-red-600">PPY</span>
+            <span class="text-white">CINE</span>
+          </h1>
+        </a>
 
-      {{-- ✅ NEW LOGO WITH STAR --}}
-      <a href="{{ route('home') }}" class="flex items-center gap-1 group">
-        <h1 class="logo-text flex items-center justify-center gap-1">
-          <span class="text-red-600">H</span>
-          <svg xmlns="http://www.w3.org/2000/svg" 
-               class="w-6 h-6 text-white star-icon inline-block" 
-               fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l2.39 7.26h7.63l-6.18 4.49 2.36 7.25L12 16.77l-6.2 4.23 2.36-7.25L2 9.26h7.61z"/>
-          </svg>
-          <span class="text-red-600">PPY</span>
-          <span class="text-white">CINE</span>
-        </h1>
-      </a>
+        {{-- Desktop Menu --}}
+        @php $current = url()->current(); @endphp
+        <nav class="hidden lg:flex items-center gap-6 text-sm">
+          <a href="{{ route('pelanggan.now-playing') }}" 
+             class="nav-link {{ str_contains($current, 'now-playing') ? 'active' : '' }}">
+             Now Playing
+          </a>
+          <a href="{{ route('pelanggan.coming-soon') }}" 
+             class="nav-link {{ str_contains($current, 'coming-soon') ? 'active' : '' }}">
+             Coming Soon
+          </a>
 
-      {{-- Menu --}}
-      @php $current = url()->current(); @endphp
-      <nav class="hidden md:flex items-center gap-6 text-sm">
+          @guest
+            <a href="{{ route('login') }}" class="nav-link {{ str_contains($current, 'login') ? 'active' : '' }}">Sign In</a>
+            <a href="{{ route('register') }}" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg font-bold text-sm transition-all hover:scale-105 shadow-lg shadow-red-500/30 hover:shadow-red-500/50">
+              Sign Up
+            </a>
+          @endguest
+
+          @auth
+            <a href="{{ route('profile.index') }}" 
+              class="nav-link {{ str_contains($current, 'akun') ? 'active' : '' }}">
+                My Account
+            </a>
+          @endauth
+        </nav>
+
+        {{-- Desktop Search Bar --}}
+        <form action="{{ route('pelanggan.search') }}" method="GET" class="relative hidden lg:block">
+          <input type="text" name="q" placeholder="Search movies..."
+                 value="{{ request('q') }}"
+                 class="bg-white/5 backdrop-blur-sm text-sm placeholder:text-gray-500 rounded-lg px-4 py-2.5 pr-10 outline-none w-64 focus:ring-2 focus:ring-red-500 border border-white/10 focus:border-red-500 transition-all">
+          <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
+            </svg>
+          </button>
+        </form>
+
+        {{-- Mobile: Search + Hamburger Buttons --}}
+        <div class="flex items-center gap-3 lg:hidden">
+          {{-- Search Toggle Button --}}
+          <button @click="searchOpen = !searchOpen" class="text-gray-400 hover:text-red-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
+            </svg>
+          </button>
+
+          {{-- Hamburger Button --}}
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-400 hover:text-red-500 transition-colors focus:outline-none">
+            <svg x-show="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+            <svg x-show="mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {{-- Mobile Search Bar --}}
+      <div x-show="searchOpen" 
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 -translate-y-2"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 -translate-y-2"
+           class="lg:hidden mt-4">
+        <form action="{{ route('pelanggan.search') }}" method="GET" class="relative">
+          <input type="text" name="q" placeholder="Search movies..."
+                 value="{{ request('q') }}"
+                 class="w-full bg-white/5 backdrop-blur-sm text-sm placeholder:text-gray-500 rounded-lg px-4 py-2.5 pr-10 outline-none focus:ring-2 focus:ring-red-500 border border-white/10 focus:border-red-500 transition-all">
+          <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      {{-- Mobile Menu --}}
+      <nav x-show="mobileMenuOpen"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 -translate-y-2"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 -translate-y-2"
+           class="lg:hidden mobile-menu mt-4 pt-4 border-t border-white/10 flex flex-col gap-3">
+        
         <a href="{{ route('pelanggan.now-playing') }}" 
-           class="nav-link {{ str_contains($current, 'now-playing') ? 'active' : '' }}">
+           class="nav-link text-base py-2 {{ str_contains($current, 'now-playing') ? 'active' : '' }}">
            Now Playing
         </a>
         <a href="{{ route('pelanggan.coming-soon') }}" 
-           class="nav-link {{ str_contains($current, 'coming-soon') ? 'active' : '' }}">
+           class="nav-link text-base py-2 {{ str_contains($current, 'coming-soon') ? 'active' : '' }}">
            Coming Soon
         </a>
 
         @guest
-          <a href="{{ route('login') }}" class="nav-link {{ str_contains($current, 'login') ? 'active' : '' }}">Sign In</a>
-          <a href="{{ route('register') }}" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg font-bold text-sm transition-all hover:scale-105 shadow-lg shadow-red-500/30 hover:shadow-red-500/50">
+          <a href="{{ route('login') }}" class="nav-link text-base py-2 {{ str_contains($current, 'login') ? 'active' : '' }}">Sign In</a>
+          <a href="{{ route('register') }}" class="px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg font-bold text-sm text-center transition-all hover:scale-105 shadow-lg shadow-red-500/30 hover:shadow-red-500/50">
             Sign Up
           </a>
         @endguest
 
         @auth
           <a href="{{ route('profile.index') }}" 
-            class="nav-link {{ str_contains($current, 'akun') ? 'active' : '' }}">
+            class="nav-link text-base py-2 {{ str_contains($current, 'akun') ? 'active' : '' }}">
               My Account
           </a>
         @endauth
       </nav>
 
-      {{-- Search Bar --}}
-      <form action="{{ route('pelanggan.search') }}" method="GET" class="relative">
-        <input type="text" name="q" placeholder="Search movies..."
-               value="{{ request('q') }}"
-               class="bg-white/5 backdrop-blur-sm text-sm placeholder:text-gray-500 rounded-lg px-4 py-2.5 pr-10 outline-none w-64 focus:ring-2 focus:ring-red-500 border border-white/10 focus:border-red-500 transition-all">
-        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
-          </svg>
-        </button>
-      </form>
     </div>
   </header>
 
